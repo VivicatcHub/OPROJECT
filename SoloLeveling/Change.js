@@ -51,14 +51,22 @@ async function Add(Element, Data) {
             });
             newElement.innerHTML = TempLieu + `</select>`;
             break;
-        case "App":
+        case "Appartenance":
             let TempApp = `<select style="color: red;">`;
             Object.keys(AppartenanceDatasPast).forEach(element => {
                 TempApp += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
             });
             newElement.innerHTML = TempApp + `</select>`;
             break;
-        case "Persos":
+        case "Appartenance\Duree":
+        case "Appartenance\\Duree":
+            let TempAppa = `<select style="color: red;">`;
+            Object.keys(AppartenanceDatasPast).forEach(element => {
+                TempAppa += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
+            });
+            newElement.innerHTML = TempAppa + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>`;
+            break;
+        case "Perso":
             let TempPersos = `<select style="color: red;">`;
             Object.keys(PersoDatasPast).forEach(element => {
                 TempPersos += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
@@ -169,7 +177,7 @@ async function Modification(Element) {
             });
             parent.innerHTML += Text + `</select>`;
             break;
-        case "App":
+        case "Appartenance":
             parent.className = "oui";
             Text = `=><select data-score="SS" style="color: red;">`;
             Object.keys(AppartenanceDatasPast).forEach(element => {
@@ -184,6 +192,13 @@ async function Modification(Element) {
                 Text += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
             });
             parent.innerHTML += Text + `</select>`;
+            break;
+        case "Appartenance\\Duree":
+            let TempAppa = `=><select data-score="SS" style="color: red;">`;
+            Object.keys(AppartenanceDatasPast).forEach(element => {
+                TempAppa += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
+            });
+            parent.innerHTML = TempAppa + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>`;
             break;
     }
 }
@@ -444,7 +459,7 @@ async function modifierPage(C, TYPE) {
                         });
                     }
                     break;
-                case "App":
+                case "Appartenance":
                     TempApp = { ...AppartenanceDatas, ...AppartenanceDatasPast };
                     if (choix in DATA1 && DATA1[choix][DATA2[compteur]] !== null) {
                         DATA1[choix][DATA2[compteur]].forEach(data => {
@@ -497,6 +512,59 @@ async function modifierPage(C, TYPE) {
                         });
                     }
                     break;
+                case "Appartenance\\Duree":
+                    TempApp = { ...AppartenanceDatas, ...AppartenanceDatasPast };
+                    if (choix in DATA1 && DATA1[choix][DATA2[compteur]] !== null) {
+                        DATA1[choix][DATA2[compteur]].forEach(data => {
+                            if (DATA3[choix] === undefined || DATA3[choix][DATA2[compteur]] === null || InDatas(data, DATA3[choix][DATA2[compteur]]) === false) {
+                                Text = `<div><select>`;
+                                Object.keys(TempApp).forEach(element => {
+                                    if (element === data[0]) {
+                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    } else {
+                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    }
+                                });
+                                // console.log("data", data);
+                                child.innerHTML += Text + `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
+                            }
+                        });
+                    }
+                    if (choix in DATA3 && DATA3[choix][DATA2[compteur]] !== null) {
+                        DATA3[choix][DATA2[compteur]].forEach(data => {
+                            // console.log("data", data);
+                            if (Array.isArray(data[0])) {
+                                Text = `<div class="oui"><select>`;
+                                Object.keys(TempApp).forEach(element => {
+                                    if (element === data[0][0]) {
+                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    } else {
+                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    }
+                                });
+                                Text += `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[1]}"></input>=><select data-score="SS" style="color: red;">`;
+                                Object.keys(TempApp).forEach(element => {
+                                    if (element === data[1][0]) {
+                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    } else {
+                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    }
+                                });
+                                child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[1]}"></input></div>`;
+                            } else {
+                                Text = `<div class="oui"><select style="color: red;">`;
+                                Object.keys(TempApp).forEach(element => {
+                                    if (element === data[0]) {
+                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    } else {
+                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
+                                    }
+                                });
+                                child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input></div>`;
+                            }
+                        });
+                    }
+                    break;
             }
         } else {
             switch (MainDatasPast[DATA2[compteur]]) {
@@ -531,12 +599,19 @@ async function modifierPage(C, TYPE) {
                     });
                     child.innerHTML += Text + `</select></div>`;
                     break;
-                case "App":
+                case "Appartenance":
                     Text = `<div class="oui"><select style="color: red;">`;
                     Object.keys(AppartenanceDatasPast).forEach(element => {
                         Text += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
                     });
                     child.innerHTML += Text + `</select></div>`;
+                    break;
+                case "Appartenance\Duree":
+                    let TempAppa = `<div class="oui"><select style="color: red;">`;
+                    Object.keys(AppartenanceDatasPast).forEach(element => {
+                        TempAppa += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
+                    });
+                    child.innerHTML = TempAppa + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
                     break;
             }
         }
@@ -608,7 +683,7 @@ function Transfo() {
                 switch (cell.getAttribute('data-score')) {
                     case "Info":
                     case "This":
-                    case "App":
+                    case "Appartenance":
                     case "Lieu":
                     case "Infom":
                         Text = ""
@@ -629,7 +704,7 @@ function Transfo() {
                             cell.innerHTML = Text.slice(0, -1);
                         }
                         break;
-                    case "Persos":
+                    case "Perso":
                         Text = ""
                         cell.querySelectorAll('select').forEach(function (child) {
                             if (child.parentElement.className === "oui") {
@@ -638,6 +713,7 @@ function Transfo() {
                         });
                         cell.innerHTML = Text.slice(0, -1);
                         break;
+                    case "Appartenance\\Duree":
                     case "Info\\Duree":
                     case "Lieu\\Duree":
                         Text = "";
@@ -1115,24 +1191,26 @@ async function generalModif() {
                     case "Info":
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]]}"></input></div></td>`;
                         break;
-                    case "Persos":
+                    case "Perso":
                         Temp = "";
-                        if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0])) {
-                            ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0];
-                        } else {
-                            ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]];
+                        if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]])) {
+                            if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0])) {
+                                ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0];
+                            } else {
+                                ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]];
+                            }
+                            ToEach.forEach(perso => {
+                                Temp += `<div class="oui"><select style="color: red;">`;
+                                Object.keys(PersoDatasPast).forEach(element => {
+                                    if (element === perso) {
+                                        Temp += `<option selected value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
+                                    } else {
+                                        Temp += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
+                                    }
+                                });
+                                Temp += `</select></div>`;
+                            })
                         }
-                        ToEach.forEach(perso => {
-                            Temp += `<div class="oui"><select style="color: red;">`;
-                            Object.keys(PersoDatasPast).forEach(element => {
-                                if (element === perso) {
-                                    Temp += `<option selected value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
-                                } else {
-                                    Temp += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
-                                }
-                            });
-                            Temp += `</select></div>`;
-                        })
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
@@ -1148,8 +1226,8 @@ async function generalModif() {
                     case "Info":
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
-                    case "Persos":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
+                    case "Perso":
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
             }
