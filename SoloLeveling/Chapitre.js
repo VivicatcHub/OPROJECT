@@ -1,4 +1,3 @@
-let ANIME = 'SoloLeveling';
 // Sélectionner le bouton
 const boutonModifierWhere = document.getElementById("modifierWhere");
 var where = localStorage.getItem(`Where${ANIME}`);
