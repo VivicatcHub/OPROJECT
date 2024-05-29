@@ -75,12 +75,12 @@ async function Add(Element, Data) {
     div.appendChild(button1);
     let button2 = document.createElement('button');
     button2.textContent = 'Supprimer';
-    button2.onclick = function () { Supp(this); };
+    button2.onclick = function () { Supp(this, Data); };
     div.appendChild(button2);
     Child.appendChild(div);
 }
 
-function Supp(Element) {
+function Supp(Element, Data) {
     function getElementFromEnd(collection, indexFromEnd) {
         var length = collection.length;
         var positiveIndex = length + indexFromEnd;
@@ -93,7 +93,7 @@ function Supp(Element) {
     var Child = Element.parentElement.parentElement;
     var As = getElementFromEnd(Child.children, -2);
     As.remove();
-    Element.remove();
+    Element.parentElement.remove();
     let div = document.createElement('div');
     let button1 = document.createElement('button');
     button1.textContent = 'Ajouter';
@@ -101,7 +101,7 @@ function Supp(Element) {
     div.appendChild(button1);
     let button2 = document.createElement('button');
     button2.textContent = 'Supprimer';
-    button2.onclick = function () { Supp(this); };
+    button2.onclick = function () { Supp(this, Data); };
     div.appendChild(button2);
     Child.appendChild(div);
 }
@@ -541,7 +541,7 @@ async function modifierPage(C, TYPE) {
             }
         }
         if (compteur > 1) {
-            child.innerHTML += `<div><button onclick="Add(this, '${MainDatasPast[DATA2[compteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></div>`;
+            child.innerHTML += `<div><button onclick="Add(this, '${MainDatasPast[DATA2[compteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[DATA2[compteur]]}')">Supprimer</button></div>`;
         }
         compteur++;
     });
@@ -1133,7 +1133,7 @@ async function generalModif() {
                             });
                             Temp += `</select></div>`;
                         })
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></div></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
             }
@@ -1149,7 +1149,7 @@ async function generalModif() {
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
                     case "Persos":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'></div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button><div></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'></div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button><div></td>`;
                         break;
                 }
             }
