@@ -1,10 +1,11 @@
 async function Add(Element, Data) {
-    let dicoReturnPast = await DatasVictory(localStorage.getItem('where_solov'), false);
+    let DATAS_RANGE = await DatasRange();
+    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
     var MainDatasPast = dicoReturnPast["Main"];
     var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
     var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
-    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chap"];
+    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chapter"];
 
     var Child = Element.parentElement;
     Element.remove();
@@ -103,13 +104,14 @@ function ajusterTaille(input) {
 }
 
 async function Modification(Element) {
-    let dicoReturnPast = await DatasVictory(localStorage.getItem('where_solov'), false);
+    let DATAS_RANGE = await DatasRange();
+    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
     // console.log(Element, Data);
     var MainDatasPast = dicoReturnPast["Main"];
     var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
     var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
-    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chap"];
+    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chapter"];
 
     var parent = Element.parentElement;
     Element.remove();
@@ -180,20 +182,24 @@ async function modifierPage(C, TYPE) {
     var choix = C.value;
     var ligne = C.parentElement.parentElement;
 
-    let dicoReturPast = await DatasVictorySpe2(localStorage.getItem('where_solov'), true);
+    let dicoReturPast = await DatasVictorySpe2(localStorage.getItem(`Where${ANIME}`), true, TYPE);
     // console.log(dicoReturPast);
     var MainDatasPast = dicoReturPast["Main"];
     var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturPast["Perso"];
     var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturPast["Lieu"];
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturPast["Appartenance"];
 
-    let dicoReturn = await DatasVictorySpe(localStorage.getItem('where_solov'));
-    // console.log("dicoReturn", dicoReturn, localStorage.getItem('where_solov'));
+    let dicoReturn = await DatasVictorySpe(localStorage.getItem(`Where${ANIME}`), TYPE);
+    // console.log("dicoReturn", dicoReturn, localStorage.getItem(`Where${ANIME}`));
     var PersoDatas = dicoReturn["Perso"][0];
     var LieuDatas = dicoReturn["Lieu"][0];
     var AppartenanceDatas = dicoReturn["Appartenance"][0];
 
-    var [DATA1, DATA2, DATA3] = { "Personnages": [PersoDatasPast, PersoDatasColumnsPast, PersoDatas], "Locations": [LieuDatasPast, LieuDatasColumnsPast, LieuDatas], "Groupes": [AppartenanceDatasPast, AppartenanceDatasColumnsPast, AppartenanceDatas] }[TYPE];
+    var [DATA1, DATA2, DATA3] = {
+        "Personnages": [PersoDatasPast, PersoDatasColumnsPast, PersoDatas],
+        "Locations": [LieuDatasPast, LieuDatasColumnsPast, LieuDatas],
+        "Groupes": [AppartenanceDatasPast, AppartenanceDatasColumnsPast, AppartenanceDatas]
+    }[TYPE];
     // console.log("DATA", DATA1, DATA2, DATA3)
 
     compteur = 0;
@@ -273,7 +279,7 @@ async function modifierPage(C, TYPE) {
                                         Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
                                     }
                                 });
-                                // console.log("data", data);
+                                console.log("data", data);
                                 child.innerHTML += Text + `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
                             }
                         });
@@ -524,15 +530,19 @@ async function modifierPage(C, TYPE) {
         }
         compteur++;
     });
-
-    let dicoReturnPast = await DatasVictory(localStorage.getItem('where_solov'), false);
-    // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem('where_solov'));
+    let DATAS_RANGE = await DatasRange();
+    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
+    console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem(`Where${ANIME}`));
     var MainDatasPast = dicoReturnPast["Main"];
     var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
     var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
 
-    [DATA1, DATA2] = { "Personnages": [PersoDatasPast, PersoDatasColumnsPast], "Locations": [LieuDatasPast, LieuDatasColumnsPast], "Groupes": [AppartenanceDatasPast, AppartenanceDatasColumnsPast] }[TYPE];
+    [DATA1, DATA2] = {
+        "Personnages": [PersoDatasPast, PersoDatasColumnsPast],
+        "Locations": [LieuDatasPast, LieuDatasColumnsPast],
+        "Groupes": [AppartenanceDatasPast, AppartenanceDatasColumnsPast]
+    }[TYPE];
 
     var table = ligne.parentElement.parentElement.getElementsByTagName('tbody')[0];
     var newRow = table.insertRow();
@@ -541,7 +551,7 @@ async function modifierPage(C, TYPE) {
     Text = ``;
     DATA2.forEach(element => {
         if (compteur[0] === 0) {
-            Text += `<td>${localStorage.getItem('where_solov')}</td>`;
+            Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
         } else if (compteur[0] === 1) {
             Text += `<td><select id="numero" name="numero" onchange="modifierPage(this, '${TYPE}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
             Object.keys(DATA1).forEach(element => {
@@ -574,8 +584,8 @@ function Transfo() {
             Vi = 1;
             Vj = 0;
         }
-        for (var i = 0; i < table.rows.length - Vi; i++) {
-            for (var j = 2 - Vj, cell; cell = table.rows[i].cells[j]; j++) {
+        for (var I = 0; I < table.rows.length - Vi; I++) {
+            for (var j = 2 - Vj, cell; cell = table.rows[I].cells[j]; j++) {
                 // console.log(cell.innerHTML);
                 if (j === 2 && cell.innerHTML.includes("<input") === false) {
                     break;
@@ -714,71 +724,74 @@ function Transfo() {
 
 }
 
-async function TraiterSheetDatasSpe(DATA, WHERE) {
+async function TraiterSheetDatasSpe(DATA, WHERE, TYPE) {
+    if (TYPE === "Main") {
+        return TraiterMainDatas(DATA)
+    }
     try {
         DATACOLUMNS = DATA.table.cols.map(element => element.label)
         let NewData = [];
         let Number = 1;
 
-        for (let i = 0; i < DATA.table.rows.length; i++) {
-            if (DATA.table.rows[i].c[0].v == WHERE) {
-                if (Number === 1 && DATA.table.rows[i].c[0].v > WHERE) {
+        for (let I = 0; I < DATA.table.rows.length; I++) {
+            if (DATA.table.rows[I].c[0].v == WHERE) {
+                if (Number === 1 && DATA.table.rows[I].c[0].v > WHERE) {
                     return [NewData, DATACOLUMNS];
-                } else if (NewData[DATA.table.rows[i].c[Number].f] !== undefined) {
+                } else if (NewData[DATA.table.rows[I].c[Number].f] !== undefined) {
                     for (let j = Number + 1; j < DATACOLUMNS.length; j++) {
-                        if (DATA.table.rows[i].c[j] !== null && DATA.table.rows[i].c[j]['v'] !== null) {
-                            TempData = StrToListSpe(DATA.table.rows[i].c[j].v);
+                        if (DATA.table.rows[I].c[j] !== null && DATA.table.rows[I].c[j]['v'] !== null) {
+                            TempData = StrToListSpe(DATA.table.rows[I].c[j].v);
                             for (let k = 0; k < TempData.length; k++) {
-                                if (NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] === null) {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                                if (NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] === null) {
+                                    NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
                                 } else if (TempData[k][0] === "+") {
                                     // console.log(TempData[k]);
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
+                                    NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
                                 } else if (TempData[k].includes("=>")) {
                                     test = TempData[k].split("=>").map(item => item.split(","));
-                                    for (let k = 0; k < NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].length; k++) {
-                                        const array1 = NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k];
+                                    for (let k = 0; k < NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]].length; k++) {
+                                        const array1 = NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]][k];
                                         const array2 = test[0];
                                         if (array1.length === array2.length && array1.every((value, index) => value === array2[index])) {
-                                            NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k] = test[1];
+                                            NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]][k] = test[1];
                                         } else if (array1 === array2[0]) {
-                                            NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k] = test[1][0];
+                                            NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]][k] = test[1][0];
                                         }
                                     }
                                 } else {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                                    NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
                                 }
                             }
                         }
                     }
                 } else {
-                    NewData[DATA.table.rows[i].c[Number].f] = {};
+                    NewData[DATA.table.rows[I].c[Number].f] = {};
                     for (let j = Number + 1; j < DATACOLUMNS.length; j++) {
-                        if (DATA.table.rows[i].c[j] !== null && DATA.table.rows[i].c[j]['v'] !== null) {
-                            TempData = StrToListSpe(DATA.table.rows[i].c[j].v);
+                        if (DATA.table.rows[I].c[j] !== null && DATA.table.rows[I].c[j]['v'] !== null) {
+                            TempData = StrToListSpe(DATA.table.rows[I].c[j].v);
                             for (let k = 0; k < TempData.length; k++) {
-                                if (NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] === undefined) {
+                                if (NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] === undefined) {
                                     if (TempData[k].includes("=>")) {
                                         test = TempData[k].split("=>").map(item => item.split(","));
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = [test];
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = [test];
                                     } else if (TempData[k][0] === "+") {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = [TempData[k].slice(1).split(",")];
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = [TempData[k].slice(1).split(",")];
                                     } else {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
                                     }
                                 } else {
                                     if (TempData[k].includes("=>")) {
                                         test = TempData[k].split("=>").map(item => item.split(","));
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(test);
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]].push(test);
                                     } else if (TempData[k][0] === "+") {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
                                     } else {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(StrToList(TempData[k])[0]);
+                                        NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]].push(StrToList(TempData[k])[0]);
                                     }
                                 }
                             }
                         } else {
-                            NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = null;
+                            NewData[DATA.table.rows[I].c[Number].f][DATACOLUMNS[j]] = null;
                         }
                     }
                 }
@@ -791,30 +804,25 @@ async function TraiterSheetDatasSpe(DATA, WHERE) {
 }
 
 async function DatasVictorySpe(WHERE) {
-    var modif = localStorage.getItem('modif_spe');
+    let DATAS_RANGE = await DatasRange();
+    var LISTE = [];
+    Object.keys(DATAS_RANGE).forEach(ele => {
+        LISTE.push(ele);
+    })
+    var modif = localStorage.getItem('ModifSpe');
     if (modif === 'true') {
         try {
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
-
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatasSpe(Persodatas, WHERE);
-
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatasSpe(Lieudatas, WHERE);
-
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatasSpe(Appartenancedatas, WHERE);
-
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatasSpe(Chapdatas, "None");
-
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatasSpe(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
+            console.log(Dico);
 
             // console.log(dico);
 
-            liste.forEach(function (B) {
-                var request = indexedDB.open(`MaBaseDeDonneesSpe_${B}`, i);
+            LISTE.forEach(function (Element) {
+                var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}_${Element}`, I);
 
                 request.onupgradeneeded = function (event) {
                     var db = event.target.result;
@@ -829,7 +837,7 @@ async function DatasVictorySpe(WHERE) {
                     // Récupérer l'objet store
                     var objectStore = transaction.objectStore('MonObjet');
                     // Ajouter l'objet à l'objet store
-                    Data = dico[B];
+                    Data = Dico[Element];
                     Data["id"] = 1;
                     var NewRequest = objectStore.put(Data);
 
@@ -851,14 +859,14 @@ async function DatasVictorySpe(WHERE) {
         }
 
         modif = false;
-        localStorage.setItem('modif_spe', modif);
+        localStorage.setItem('ModifSpe', modif);
     } else {
-        var dico = {};
+        var Dico = {};
         try {
             var promesses = [];
-            for (let B of liste) {
+            LISTE.forEach(function (Element) {
                 var promesse = new Promise(function (resolve, reject) {
-                    var request = indexedDB.open(`MaBaseDeDonneesSpe_${B}`, i);
+                    var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}_${Element}`, I);
 
                     request.onsuccess = function (event) {
                         // Obtention de la référence à la base de données ouverte
@@ -870,8 +878,8 @@ async function DatasVictorySpe(WHERE) {
                         var getRequest = objectStore.get(1);
 
                         getRequest.onsuccess = function (event) {
-                            dico[B] = getRequest.result;
-                            // console.log("Récupération réussie pour :", B)
+                            Dico[Element] = getRequest.result;
+                            // console.log("Récupération réussie pour :", Element)
                             resolve();
                         };
 
@@ -888,70 +896,54 @@ async function DatasVictorySpe(WHERE) {
 
                     request.onupgradeneeded = async function (event) {
                         modif = 'true';
-                        localStorage.setItem('modif_spe', modif);
-                        i++;
-                        localStorage.setItem('i', i);
+                        localStorage.setItem('ModifSpe', modif);
+                        I++;
+                        localStorage.setItem('I', I);
                         location.reload();
                     };
                 });
                 promesses.push(promesse);
-            }
+            });
             await Promise.all(promesses).catch(function (error) {
                 console.error('Une erreur est survenue lors de la récupération des données :', error);
             });
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
-
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
-
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatasSpe(Persodatas, WHERE);
-
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatasSpe(Lieudatas, WHERE);
-
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatasSpe(Appartenancedatas, WHERE);
-
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatasSpe(Chapdatas, "None");
-
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
-            return dico;
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatasSpe(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
+            console.log(Dico);
+            return Dico;
         }
     }
 
-    return dico;
+    return Dico;
 }
 
 async function DatasVictorySpe2(WHERE) {
-    var modif = localStorage.getItem('modif_spe2');
+    let DATAS_RANGE = await DatasRange();
+    var LISTE = [];
+    Object.keys(DATAS_RANGE).forEach(ele => {
+        LISTE.push(ele);
+    })
+    console.log(LISTE);
+    var modif = localStorage.getItem('ModifSpe2');
     WHERE = String(Number(WHERE) - 1);
     if (modif === 'true') {
         try {
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
-
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatas(Persodatas, WHERE);
-
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatas(Lieudatas, WHERE);
-
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatas(Appartenancedatas, WHERE);
-
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatas(Chapdatas, "None");
-
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
 
             // console.log(dico);
 
-            liste.forEach(function (B) {
-                var request = indexedDB.open(`MaBaseDeDonneesSpe2_${B}`, i);
+            LISTE.forEach(function (Element) {
+                var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}_${Element}`, I);
 
                 request.onupgradeneeded = function (event) {
                     var db = event.target.result;
@@ -966,7 +958,7 @@ async function DatasVictorySpe2(WHERE) {
                     // Récupérer l'objet store
                     var objectStore = transaction.objectStore('MonObjet');
                     // Ajouter l'objet à l'objet store
-                    Data = dico[B];
+                    Data = Dico[Element];
                     Data["id"] = 1;
                     var NewRequest = objectStore.put(Data);
 
@@ -988,14 +980,14 @@ async function DatasVictorySpe2(WHERE) {
         }
 
         modif = false;
-        localStorage.setItem('modif_spe2', modif);
+        localStorage.setItem('ModifSpe2', modif);
     } else {
-        var dico = {};
+        var Dico = {};
         try {
             var promesses = [];
-            for (let B of liste) {
+            LISTE.forEach(function (Element) {
                 var promesse = new Promise(function (resolve, reject) {
-                    var request = indexedDB.open(`MaBaseDeDonneesSpe2_${B}`, i);
+                    var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}_${Element}`, I);
 
                     request.onsuccess = function (event) {
                         // Obtention de la référence à la base de données ouverte
@@ -1007,8 +999,8 @@ async function DatasVictorySpe2(WHERE) {
                         var getRequest = objectStore.get(1);
 
                         getRequest.onsuccess = function (event) {
-                            dico[B] = getRequest.result;
-                            // console.log("Récupération réussie pour :", B)
+                            Dico[Element] = getRequest.result;
+                            // console.log("Récupération réussie pour :", Element)
                             resolve();
                         };
 
@@ -1025,54 +1017,45 @@ async function DatasVictorySpe2(WHERE) {
 
                     request.onupgradeneeded = async function (event) {
                         modif = 'true';
-                        localStorage.setItem('modif_spe2', modif);
-                        i++;
-                        localStorage.setItem('i', i);
+                        localStorage.setItem('ModifSpe2', modif);
+                        I++;
+                        localStorage.setItem('I', I);
                         location.reload();
                     };
                 });
                 promesses.push(promesse);
-            }
+            });
             await Promise.all(promesses).catch(function (error) {
                 console.error('Une erreur est survenue lors de la récupération des données :', error);
             });
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
-
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
-
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatas(Persodatas, WHERE);
-
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatas(Lieudatas, WHERE);
-
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatas(Appartenancedatas, WHERE);
-
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatas(Chapdatas, "None");
-
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
-            return dico;
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
+            console.log(Dico);
+            return Dico;
         }
     }
 
-    return dico;
+    console.log(Dico);
+    return Dico;
 }
 
 async function generalModif() {
-    localStorage.setItem('modif_spe', 'true');
-    localStorage.setItem('modif_spe2', 'true');
-    let dicoReturnPast = await DatasVictory(localStorage.getItem('where_solov'), false);
-    // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem('where_solov'));
+    let DATAS_RANGE = await DatasRange();
+    localStorage.setItem('ModifSpe', 'true');
+    localStorage.setItem('ModifSpe2', 'true');
+    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
+    // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem(`Where${ANIME}`));
     var MainDatasPast = dicoReturnPast["Main"];
     var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
     var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
-    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chap"];
+    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chapter"];
 
     var divPro = document.getElementById("modification");
 
@@ -1086,7 +1069,7 @@ async function generalModif() {
         Text += `</tr></thead><tbody><tr id="${compteur[1]}">`;
         Datas[1].forEach(element => {
             if (compteur[0] === 0) {
-                Text += `<td>${localStorage.getItem('where_solov')}</td>`;
+                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
             } else if (compteur[0] === 1) {
                 Text += `<td><select id="numero" name="numero" onchange="modifierPage(this, '${Datas[2]}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
                 Object.keys(Datas[0]).forEach(element => {
@@ -1108,21 +1091,21 @@ async function generalModif() {
 
     NewCompteur = 0;
     Text += `</tr></thead><tbody><tr id="${NewCompteur}">`;
-    if (localStorage.getItem('where_solov') in ChapDatasPast) {
+    if (localStorage.getItem(`Where${ANIME}`) in ChapDatasPast) {
         ChapDatasColumnsPast.forEach(element => {
             if (NewCompteur === 0) {
-                Text += `<td>${localStorage.getItem('where_solov')}</td>`;
+                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
             } else {
                 switch (MainDatasPast[ChapDatasColumnsPast[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${ChapDatasPast[localStorage.getItem('where_solov')][ChapDatasColumnsPast[NewCompteur]]}"></input></div></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Persos":
                         Temp = "";
-                        if (Array.isArray(ChapDatasPast[localStorage.getItem('where_solov')][ChapDatasColumnsPast[NewCompteur]][0])) {
-                            ToEach = ChapDatasPast[localStorage.getItem('where_solov')][ChapDatasColumnsPast[NewCompteur]][0];
+                        if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0])) {
+                            ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0];
                         } else {
-                            ToEach = ChapDatasPast[localStorage.getItem('where_solov')][ChapDatasColumnsPast[NewCompteur]];
+                            ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]];
                         }
                         ToEach.forEach(perso => {
                             Temp += `<div class="oui"><select style="color: red;">`;
@@ -1144,7 +1127,7 @@ async function generalModif() {
     } else {
         ChapDatasColumnsPast.forEach(element => {
             if (NewCompteur === 0) {
-                Text += `<td>${localStorage.getItem('where_solov')}</td>`;
+                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
             } else {
                 switch (MainDatasPast[ChapDatasColumnsPast[NewCompteur]]) {
                     case "Info":
@@ -1172,7 +1155,7 @@ async function generalModif() {
     Text += `</tr></thead><tbody><tr id="${compteur[1]}">`;
     PersoDatasColumnsPast.forEach(element => {
         if (compteur[0] === 0) {
-            Text += `<td>${localStorage.getItem('where_solov')}</td>`;
+            Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
         } else if (compteur[0] === 1) {
             Text += `<td><select id="numero" name="numero" onchange="modifierPage(${compteur[1]})"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
             Object.keys(PersoDatasPast).forEach(element => {
