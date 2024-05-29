@@ -84,11 +84,19 @@ function Supp(Element) {
             return undefined;
         }
     }
+
     var Child = Element.parentElement;
     var As = getElementFromEnd(Child.children, -3);
-    As.remove();
+    if (As) {
+        As.remove();
+    }
     Element.remove();
-    Child.innerHTML += "<button onclick='Supp(this)'>Supprimer</button>";
+
+    // Création d'un nouveau bouton et ajout à Child
+    var newButton = document.createElement('button');
+    newButton.textContent = 'Supprimer';
+    newButton.onclick = function() { Supp(newButton); };
+    Child.appendChild(newButton);
 }
 
 function ajusterTaille(input) {
