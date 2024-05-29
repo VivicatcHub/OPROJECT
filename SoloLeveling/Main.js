@@ -1,18 +1,43 @@
+// INFOS SHEET
+let ANIME = 'SoloLeveling';
+let SHEET_ID = '1eqWmcikQwZYszoS1GeaNnGTHVQzy52Nsrj2qyAXp7fg';
+let GENERAL_RANGE = 'A2:B6';
+
+var WHERE = localStorage.getItem(`Where${ANIME}`);
+var MODIF = localStorage.getItem('Modif');
+var I = localStorage.getItem('I');
+if (I === null) {
+    I = 1;
+    localStorage.setItem('I', I);
+}
+var II = localStorage.getItem('II');
+if (II === null) {
+    II = 1;
+    localStorage.setItem('II', II);
+}
+var CHAR = (new URLSearchParams(window.location.search)).get('char');
+var CHAP = (new URLSearchParams(window.location.search)).get('chap');
+var LIEU = (new URLSearchParams(window.location.search)).get('lieu');
+
+
 async function RecupSheetDatas(ID, TITLE, RANGE) {
     try {
-        const URL = `https://docs.google.com/spreadsheets/d/${ID}/gviz/tq?sheet=${TITLE}&range=${RANGE}`;
-        const response = await fetch(URL);
-        const text = await response.text();
-        const data = JSON.parse(text.substr(47).slice(0, -2));
-        return data;
+        const Url = `https://docs.google.com/spreadsheets/d/${ID}/gviz/tq?sheet=${TITLE}&range=${RANGE}`;
+        const Response = await fetch(Url);
+        const Text = await Response.text();
+        const Data = JSON.parse(Text.substr(47).slice(0, -2));
+        return Data;
     } catch (error) {
         throw error;
     }
 }
 
-async function TraiterSheetDatas(DATA, WHERE) {
+async function TraiterSheetDatas(DATA, WHERE, TYPE) {
+    if (TYPE === "Main") {
+        return TraiterMainDatas(DATA)
+    }
     try {
-        DATACOLUMNS = DATA.table.cols.map(element => element.label)
+        Datacolumns = DATA.table.cols.map(Element => Element.label)
         let NewData = [];
         let Number = 1;
 
@@ -22,66 +47,66 @@ async function TraiterSheetDatas(DATA, WHERE) {
 
         for (let i = 0; i < DATA.table.rows.length; i++) {
             if (Number === 1 && DATA.table.rows[i].c[0].v > WHERE) {
-                return [NewData, DATACOLUMNS];
+                return [NewData, Datacolumns];
             } else if (NewData[DATA.table.rows[i].c[Number].f] !== undefined) {
-                for (let j = Number + 1; j < DATACOLUMNS.length; j++) {
+                for (let j = Number + 1; j < Datacolumns.length; j++) {
                     if (DATA.table.rows[i].c[j] !== null && DATA.table.rows[i].c[j]['v'] !== null) {
                         TempData = StrToListSpe(DATA.table.rows[i].c[j].v);
                         for (let k = 0; k < TempData.length; k++) {
-                            if (NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] === null) {
-                                NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                            if (NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] === null) {
+                                NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = StrToList(TempData[k]);
                             } else if (TempData[k][0] === "+") {
-                                NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
+                                NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]].push(TempData[k].slice(1).split(","));
                             } else if (TempData[k].includes("=>")) {
                                 test = TempData[k].split("=>").map(item => item.split(","));
-                                for (let k = 0; k < NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].length; k++) {
-                                    const array1 = NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k];
+                                for (let k = 0; k < NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]].length; k++) {
+                                    const array1 = NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]][k];
                                     const array2 = test[0];
                                     if (array1.length === array2.length && array1.every((value, index) => value === array2[index])) {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k] = test[1];
+                                        NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]][k] = test[1];
                                     } else if (array1 === array2[0]) {
-                                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]][k] = test[1][0];
+                                        NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]][k] = test[1][0];
                                     }
                                 }
                             } else {
-                                NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                                NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = StrToList(TempData[k]);
                             }
                         }
                     }
                 }
             } else {
                 NewData[DATA.table.rows[i].c[Number].f] = {};
-                for (let j = Number + 1; j < DATACOLUMNS.length; j++) {
+                for (let j = Number + 1; j < Datacolumns.length; j++) {
                     if (DATA.table.rows[i].c[j] !== null && DATA.table.rows[i].c[j]['v'] !== null) {
                         TempData = StrToListSpe(DATA.table.rows[i].c[j].v);
                         for (let k = 0; k < TempData.length; k++) {
-                            if (NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] === undefined) {
+                            if (NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] === undefined) {
                                 if (TempData[k].includes("=>")) {
                                     test = TempData[k].split("=>").map(item => item.split(","));
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = [test];
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = [test];
                                 } else if (TempData[k][0] === "+") {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = [TempData[k].slice(1).split(",")];
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = [TempData[k].slice(1).split(",")];
                                 } else {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = StrToList(TempData[k]);
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = StrToList(TempData[k]);
                                 }
                             } else {
                                 if (TempData[k].includes("=>")) {
                                     test = TempData[k].split("=>").map(item => item.split(","));
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(test);
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]].push(test);
                                 } else if (TempData[k][0] === "+") {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(TempData[k].slice(1).split(","));
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]].push(TempData[k].slice(1).split(","));
                                 } else {
-                                    NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]].push(StrToList(TempData[k])[0]);
+                                    NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]].push(StrToList(TempData[k])[0]);
                                 }
                             }
                         }
                     } else {
-                        NewData[DATA.table.rows[i].c[Number].f][DATACOLUMNS[j]] = null;
+                        NewData[DATA.table.rows[i].c[Number].f][Datacolumns[j]] = null;
                     }
                 }
             }
         }
-        return [NewData, DATACOLUMNS];
+        return [NewData, Datacolumns];
     } catch (error) {
         throw error;
     }
@@ -124,14 +149,14 @@ function Ordre(VAL, CHAPTERS) {
 
 // FONCTION POUR SAVOIR SI L'EVENEMENT EST ACTUEL
 function InTime(STR, CHAP, CHAPTERS) {
-    let data = STR.replaceAll("?", "");
-    data = data.split("-");
-    return parseInt(Ordre(data[0], CHAPTERS)) <= Ordre(CHAP, CHAPTERS) && (Ordre(data[1], CHAPTERS) === "" || Ordre(CHAP, CHAPTERS) < parseInt(Ordre(data[1], CHAPTERS)));
+    let Data = STR.replaceAll("?", "");
+    Data = Data.split("-");
+    return parseInt(Ordre(Data[0], CHAPTERS)) <= Ordre(CHAP, CHAPTERS) && (Ordre(Data[1], CHAPTERS) === "" || Ordre(CHAP, CHAPTERS) < parseInt(Ordre(Data[1], CHAPTERS)));
 }
 
 async function TraiterMainDatas(DATA) {
     try {
-        DATACOLUMNS = DATA.table.cols.map(element => element.label)
+        Datacolumns = DATA.table.cols.map(element => element.label)
         let NewData = [];
 
         for (let i = 0; i < DATA.table.rows.length; i++) {
@@ -143,49 +168,143 @@ async function TraiterMainDatas(DATA) {
     }
 }
 
-async function DatasVictory(WHERE, SPE) {
-    var modif = localStorage.getItem('modif');
-    if (modif === 'true' || SPE === true) {
+async function DatasRange() {
+    var Modif = localStorage.getItem('Modif');
+    if (Modif === 'true') {
         try {
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
+            var NewDatas = await RecupSheetDatas(SHEET_ID, "General", GENERAL_RANGE);
+            var Datas = {};
+            NewDatas.table.rows.forEach(element => {
+                // console.log(element);
+                Datas[element.c[0].v] = element.c[1].v;
+            })
+            // console.log("datas:", Datas);
+            var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, 1);
 
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatas(Persodatas, WHERE);
+            Request.onupgradeneeded = function (event) {
+                var Db = event.target.result;
+                var ObjectStore = Db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true }); // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+            };
 
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatas(Lieudatas, WHERE);
+            Request.onsuccess = function (event) {
+                var Db = event.target.result;
+                var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
+                var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
+                var NewRequest = ObjectStore.put(Datas);
 
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatas(Appartenancedatas, WHERE);
+                NewRequest.onsuccess = function (event) {
+                    console.log("Objet General modifié avec succès !");
+                };
 
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatas(Chapdatas, "None");
+                NewRequest.onerror = function (event) {
+                    console.error("Erreur lors de l'ajout de l'objet General:", event.target.error);
+                };
+            };
 
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
+            Request.onerror = function (event) {
+                console.error("Erreur lors de l'ouverture de la base de données General:", event.target.error);
+            };
 
-            console.log(dico);
+        } catch (error) {
+            console.error('Une erreur est survenue :', error);
+        }
+    } else {
+        try {
+            var Promesse = new Promise(function (Resolve, Reject) {
+                var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, 1);
 
-            if (SPE === false) {
-                liste.forEach(function (B) {
-                    var request = indexedDB.open(`MaBaseDeDonnees_${B}`, i);
+                Request.onsuccess = function (event) {
+                    var Db = event.target.result; // Obtention de la référence à la base de données ouverte
+                    var Transaction = Db.transaction(['MonObjet'], 'readonly'); // Utilisation de la base de données pour effectuer des opérations | par exemple, récupérer des données depuis un objet store
+                    var OjectStore = Transaction.objectStore('MonObjet');
+                    var GetRequest = OjectStore.get(1);
 
-                    request.onupgradeneeded = function (event) {
-                        var db = event.target.result;
-                        // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
-                        var objectStore = db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true });
+                    GetRequest.onsuccess = function (event) {
+                        Datas = GetRequest.result;
+                        console.log("Récupération réussie pour: Général")
+                        delete Datas.id;
+                        Resolve(Datas);
                     };
 
-                    request.onsuccess = function (event) {
-                        var db = event.target.result;
-                        // Commencer une transaction en mode lecture-écriture
-                        var transaction = db.transaction(['MonObjet'], 'readwrite');
-                        // Récupérer l'objet store
-                        var objectStore = transaction.objectStore('MonObjet');
-                        // Ajouter l'objet à l'objet store
-                        Data = dico[B];
+                    GetRequest.onerror = function (event) {
+                        console.error("Erreur lors de la récupération de l'objet Général:", event.target.error);
+                        Reject(event.target.error);
+                    };
+                };
+
+                Request.onerror = function (event) {
+                    console.error("Erreur lors de l'ouverture de la base de données Général:", event.target.error);
+                    Reject(event.target.error);
+                };
+
+                Request.onupgradeneeded = async function (event) {
+                    MODIF = 'true';
+                    localStorage.setItem('Modif', MODIF);
+                    II++;
+                    localStorage.setItem('II', II);
+                    location.reload();
+                };
+            });
+            Datas = await Promesse;
+            return Datas;
+
+        } catch (error) {
+            console.error('Une erreur est survenue :', error);
+            var NewDatas = await RecupSheetDatas(SHEET_ID, "General", GENERAL_RANGE);
+            var Datas = {};
+            NewDatas.table.rows.forEach(element => {
+                // console.log(element);
+                Datas[element.c[0].v] = element.c[1].v;
+            })
+            return Datas;
+        }
+    }
+
+    return Datas;
+}
+
+function WhereOrNot(TYPE, WHERE) {
+    switch (TYPE) {
+        case "Main":
+        case "Chapter":
+            return 'None';
+        default:
+            return WHERE;
+    }
+}
+
+async function DatasVictory(WHERE, SPE, Datas) {
+    var LISTE = [];
+    Object.keys(Datas).forEach(ele => {
+        LISTE.push(ele);
+    })
+    var MODIF = localStorage.getItem('Modif');
+    if (MODIF === 'true' || SPE === true) {
+        try {
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, Datas[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
+            console.log(Dico);
+
+            if (SPE === false) {
+                LISTE.forEach(function (Element) {
+                    var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_${Element}`, I);
+
+                    Request.onupgradeneeded = function (event) {
+                        var Db = event.target.result;
+                        var ObjectStore = Db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true }); // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+                    };
+
+                    Request.onsuccess = function (event) {
+                        var Db = event.target.result;
+                        var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
+                        var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
+                        Data = Dico[Element]; // Ajouter l'objet à l'objet store
+                        console.log("Data:", Data, Element);
                         Data["id"] = 1;
-                        var NewRequest = objectStore.put(Data);
+                        var NewRequest = ObjectStore.put(Data);
 
                         NewRequest.onsuccess = function (event) {
                             console.log("Objet modifié avec succès !");
@@ -196,8 +315,8 @@ async function DatasVictory(WHERE, SPE) {
                         };
                     };
 
-                    request.onerror = function (event) {
-                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    Request.onerror = function (event) {
+                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error, Element);
                     };
                 });
             }
@@ -206,108 +325,68 @@ async function DatasVictory(WHERE, SPE) {
             console.error('Une erreur est survenue :', error);
         }
 
-        modif = false;
-        localStorage.setItem('modif', modif);
+        MODIF = false;
+        localStorage.setItem('Modif', MODIF);
     }
     else {
-        var dico = {};
+        var Dico = {};
         try {
-            var promesses = [];
-            for (let B of liste) {
-                var promesse = new Promise(function (resolve, reject) {
-                    var request = indexedDB.open(`MaBaseDeDonnees_${B}`, i);
+            var Promesses = [];
+            LISTE.forEach(function (Element) {
+                var Promesse = new Promise(function (Resolve, Reject) {
+                    var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_${Element}`, I);
 
-                    request.onsuccess = function (event) {
-                        // Obtention de la référence à la base de données ouverte
-                        var db = event.target.result;
-                        // Utilisation de la base de données pour effectuer des opérations
-                        // par exemple, récupérer des données depuis un objet store
-                        var transaction = db.transaction(['MonObjet'], 'readonly');
-                        var objectStore = transaction.objectStore('MonObjet');
-                        var getRequest = objectStore.get(1);
+                    Request.onsuccess = function (event) {
+                        var Db = event.target.result; // Obtention de la référence à la base de données ouverte
+                        var Transaction = Db.transaction(['MonObjet'], 'readonly'); // Utilisation de la base de données pour effectuer des opérations | par exemple, récupérer des données depuis un objet store
+                        var ObjectStore = Transaction.objectStore('MonObjet');
+                        var GetRequest = ObjectStore.get(1);
 
-                        getRequest.onsuccess = function (event) {
-                            dico[B] = getRequest.result;
-                            console.log("Récupération réussie pour :", B)
-                            resolve();
+                        GetRequest.onsuccess = function (event) {
+                            Dico[Element] = GetRequest.result;
+                            console.log("Récupération réussie pour :", Element)
+                            Resolve();
                         };
 
-                        getRequest.onerror = function (event) {
+                        GetRequest.onerror = function (event) {
                             console.error("Erreur lors de la récupération de l'objet :", event.target.error);
-                            reject(event.target.error);
+                            Reject(event.target.error);
                         };
                     };
 
-                    request.onerror = function (event) {
+                    Request.onerror = function (event) {
                         console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
-                        reject(event.target.error);
+                        Reject(event.target.error);
                     };
 
-                    request.onupgradeneeded = async function (event) {
-                        modif = 'true';
-                        localStorage.setItem('modif', modif);
-                        i++;
-                        localStorage.setItem('i', i);
+                    Request.onupgradeneeded = async function (event) {
+                        MODIF = 'true';
+                        localStorage.setItem('Modif', MODIF);
+                        I++;
+                        localStorage.setItem('I', I);
                         location.reload();
                     };
                 });
-                promesses.push(promesse);
-            }
-            await Promise.all(promesses).catch(function (error) {
+                Promesses.push(Promesse);
+            });
+            await Promise.all(Promesses).catch(function (error) {
                 console.error('Une erreur est survenue lors de la récupération des données :', error);
             });
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
-
-            var Maindatas = await RecupSheetDatas(SheetId, SheetTitleMain, SheetRangeMain);
-            var MainDatas = await TraiterMainDatas(Maindatas);
-
-            let Persodatas = await RecupSheetDatas(SheetId, SheetTitlePerso, SheetRangePerso);
-            var [PersoDatas, PersoDatasColumns] = await TraiterSheetDatas(Persodatas, WHERE);
-
-            let Lieudatas = await RecupSheetDatas(SheetId, SheetTitleLieu, SheetRangeLieu);
-            var [LieuDatas, LieuDatasColumns] = await TraiterSheetDatas(Lieudatas, WHERE);
-
-            let Appartenancedatas = await RecupSheetDatas(SheetId, SheetTitleAppartenance, SheetRangeAppartenance);
-            var [AppartenanceDatas, AppartenanceDatasColumns] = await TraiterSheetDatas(Appartenancedatas, WHERE);
-
-            let Chapdatas = await RecupSheetDatas(SheetId, SheetTitleChapter, SheetRangeChapter);
-            var [ChapDatas, ChapDatasColumns] = await TraiterSheetDatas(Chapdatas, "None");
-
-            var dico = { "Main": MainDatas, "Perso": [PersoDatas, PersoDatasColumns], "Lieu": [LieuDatas, LieuDatasColumns], "Appartenance": [AppartenanceDatas, AppartenanceDatasColumns], "Chap": [ChapDatas, ChapDatasColumns] };
-            return dico;
+            var Dico = {};
+            var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, Datas[Element]), await WhereOrNot(Element, WHERE), Element);
+            });
+            await Promise.all(promises); // Attendre que toutes les promesses se terminent
+            console.log(Dico);
+            return Dico;
         }
     }
 
-    return dico;
+    return Dico;
 }
-
-// INFOS SHEET
-let SheetId = '1eqWmcikQwZYszoS1GeaNnGTHVQzy52Nsrj2qyAXp7fg';
-let SheetTitleMain = 'Main';
-let SheetRangeMain = 'A1:C33';
-let SheetTitlePerso = 'Perso';
-let SheetRangePerso = 'A1:AA1000';
-let SheetTitleChapter = 'Chapter';
-let SheetRangeChapter = "A1:E500";
-let SheetTitleLieu = 'Lieu';
-let SheetRangeLieu = 'A1:D50';
-let SheetTitleAppartenance = 'Appartenance';
-let SheetRangeAppartenance = 'A1:E50';
-
-let liste = ["Main", "Perso", "Appartenance", "Lieu", "Chap"];
-
-var where = localStorage.getItem('where_solov');
-var modif = localStorage.getItem('modif');
-var i = localStorage.getItem('i');
-if (i === null) {
-    i = 1;
-    localStorage.setItem('i', i);
-}
-var char = (new URLSearchParams(window.location.search)).get('char');
-var chap = (new URLSearchParams(window.location.search)).get('chap');
-var lieu = (new URLSearchParams(window.location.search)).get('lieu');
 
 async function general() {
     async function Afficher(TYPE, DATA, MAIN) {
@@ -320,34 +399,34 @@ async function general() {
                 let Affichage = [];
                 if (MAIN[DATA] == "Info\\Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][1], chap, ChapDatas) && Affichage[0] === undefined) {
+                        if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
                             Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0]);
-                        } else if (InTime(TYPE[DATA][l][1], chap, ChapDatas)) {
+                        } else if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas)) {
                             Affichage.push(TYPE[DATA][l][0]);
                         }
                     }
                 } else if (MAIN[DATA] == "Info\\Infos\\Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][2], chap, ChapDatas) && Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0] + " Niv." + TYPE[DATA][l][1]);
-                        } else if (InTime(TYPE[DATA][l][2], chap, ChapDatas)) {
-                            Affichage.push(TYPE[DATA][l][0] + " Niv." + TYPE[DATA][l][1]);
+                        if (InTime(TYPE[DATA][l][2], CHAP, ChapDatas) && Affichage[0] === undefined) {
+                            Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
+                        } else if (InTime(TYPE[DATA][l][2], CHAP, ChapDatas)) {
+                            Affichage.push(TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
                         }
                     }
                 } else if (MAIN[DATA] == "Lieu\\Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][1], chap, ChapDatas) && Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + chap + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
-                        } else if (InTime(TYPE[DATA][l][1], chap, ChapDatas)) {
-                            Affichage.push("<a href='index.html?chap=" + chap + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
+                        if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
+                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
+                        } else if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas)) {
+                            Affichage.push("<a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
                         }
                     }
                 } else if (MAIN[DATA] == "Perso\\Infos") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
                         if (Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + chap + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
+                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
                         } else {
-                            Affichage.push("<a href='index.html?chap=" + chap + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
+                            Affichage.push("<a href='index.html?chap=" + CHAP + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
                         }
                     }
                 }
@@ -361,20 +440,22 @@ async function general() {
             }
         }
     }
+    Datas = await DatasRange();
+    console.log(Datas);
 
     try {
-        let dicoReturn = await DatasVictory(where, false);
+        let dicoReturn = await DatasVictory(WHERE, false, Datas);
         console.log(dicoReturn);
         var MainDatas = dicoReturn["Main"];
         var [PersoDatas, PersoDatasColumns] = dicoReturn["Perso"];
         var [LieuDatas, LieuDatasColumns] = dicoReturn["Lieu"];
         var [AppartenanceDatas, AppartenanceDatasColumns] = dicoReturn["Appartenance"];
-        var [ChapDatas, ChapDatasColumns] = dicoReturn["Chap"];
+        var [ChapDatas, ChapDatasColumns] = dicoReturn["Chapter"];
 
         // RIEN
-        if (chap === null && char === null && lieu === null) {
+        if (CHAP === null && CHAR === null && LIEU === null) {
             let Text = "";
-            for (let k = 0; k <= where; k++) {
+            for (let k = 0; k <= WHERE; k++) {
                 if (ChapDatas[k] !== undefined) {
                     Text += `<a href="index.html?chap=${k}">Chapitre ${k}</a><br>`
                 }
@@ -384,25 +465,25 @@ async function general() {
             document.getElementById("Data").innerHTML = Text;
 
             // CHAP
-        } else if (chap !== null && char === null && lieu === null) {
+        } else if (CHAP !== null && CHAR === null && LIEU === null) {
             let Text = "Personnages du chapitre<br><div class='vu'>";
-            for (let k = 0; k <= ChapDatas[chap]["Personnages"][0].length; k++) {
-                if (PersoDatas[ChapDatas[chap]["Personnages"][0][k]] !== undefined && ChapDatas[chap]["Personnages"][0][k] !== undefined) {
-                    if (PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Image"] !== null) {
-                        Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Nom"]}</a></p>`;
+            for (let k = 0; k <= ChapDatas[CHAP]["Personnages"][0].length; k++) {
+                if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]] !== undefined && ChapDatas[CHAP]["Personnages"][0][k] !== undefined) {
+                    if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"] !== null) {
+                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                     } else {
-                        Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                     }
                 }
             }
             Text += "</div>Personnages mentionnés<br><div class='mentio'>";
-            if (ChapDatas[chap]["Mentionnés"] !== null && ChapDatas[chap]["Mentionnés"][0] !== null) {
-                for (let k = 0; k <= ChapDatas[chap]["Mentionnés"][0].length; k++) {
-                    if (ChapDatas[chap]["Mentionnés"][0][k] !== undefined) {
-                        if (PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Image"] !== null) {
-                            Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+            if (ChapDatas[CHAP]["Mentionnés"] !== null && ChapDatas[CHAP]["Mentionnés"][0] !== null) {
+                for (let k = 0; k <= ChapDatas[CHAP]["Mentionnés"][0].length; k++) {
+                    if (ChapDatas[CHAP]["Mentionnés"][0][k] !== undefined) {
+                        if (PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"] !== null) {
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         } else {
-                            Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         }
                     }
                 }
@@ -411,36 +492,36 @@ async function general() {
             }
             Text += "</div>"
 
-            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${chap}`;
+            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
             document.getElementById("Data").innerHTML = Text;
 
             var curseur = $("#poignee");
-            curseur.text(chap);
+            curseur.text(CHAP);
             $("#barre").slider(
                 {
-                    min: 0, max: where,
+                    min: 0, max: WHERE,
                     slide: function (event, ui) {
                         curseur.text(ui.value);
-                        chap = ui.value;
+                        CHAP = ui.value;
                         try {
                             let Text = "Personnages du chapitre<br><div class='vu'>";
-                            for (let k = 0; k <= ChapDatas[chap]["Personnages"][0].length; k++) {
-                                if (PersoDatas[ChapDatas[chap]["Personnages"][0][k]] !== undefined && ChapDatas[chap]["Personnages"][0][k] !== undefined) {
-                                    if (PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Image"] !== null) {
-                                        Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Image"]}">${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                            for (let k = 0; k <= ChapDatas[CHAP]["Personnages"][0].length; k++) {
+                                if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]] !== undefined && ChapDatas[CHAP]["Personnages"][0][k] !== undefined) {
+                                    if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"] !== null) {
+                                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                                     } else {
-                                        Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[chap]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                                     }
                                 }
                             }
                             Text += "</div>Personnages mentionnés<br><div class='mentio'>";
-                            if (ChapDatas[chap]["Mentionnés"] !== null && ChapDatas[chap]["Mentionnés"][0] !== null) {
-                                for (let k = 0; k <= ChapDatas[chap]["Mentionnés"][0].length; k++) {
-                                    if (ChapDatas[chap]["Mentionnés"][0][k] !== undefined) {
-                                        if (PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Image"] !== null) {
-                                            Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                            if (ChapDatas[CHAP]["Mentionnés"] !== null && ChapDatas[CHAP]["Mentionnés"][0] !== null) {
+                                for (let k = 0; k <= ChapDatas[CHAP]["Mentionnés"][0].length; k++) {
+                                    if (ChapDatas[CHAP]["Mentionnés"][0][k] !== undefined) {
+                                        if (PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"] !== null) {
+                                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                                         } else {
-                                            Text += `<p><a href="index.html?chap=${chap}&char=${ChapDatas[chap]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[chap]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                                         }
                                     }
                                 }
@@ -449,40 +530,40 @@ async function general() {
                             }
                             Text += "</div>"
 
-                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${chap}`;
+                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
                             document.getElementById("Data").innerHTML = Text;
                         } catch (error) {
                             console.log(error);
-                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${chap}`;
+                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
                             document.getElementById("Data").innerHTML = "Ce chapitre n'a pas encore été documenté";
                         }
                     }
                 }
             )
             // CHAR
-        } else if (chap === null && char !== null && lieu === null) {
-            document.getElementById("Character_Name").innerHTML = PersoDatas[char]["Nom"];
+        } else if (CHAP === null && CHAR !== null && LIEU === null) {
+            document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
             var text = [];
             for (let i = 1; i < PersoDatasColumns.length; i++) {
-                if (PersoDatasColumns[i] === "Image" && PersoDatas[char][PersoDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + PersoDatas[char][PersoDatasColumns[i]] + "' alt='" + PersoDatas[char]["Nom"] + "'>");
-                } else if (PersoDatas[char][PersoDatasColumns[i]] !== null) {
-                    text.push(PersoDatasColumns[i] + ":<br>" + PersoDatas[char][PersoDatasColumns[i]]);
+                if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
+                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
+                } else if (PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
+                    text.push(PersoDatasColumns[i] + ":<br>" + PersoDatas[CHAR][PersoDatasColumns[i]]);
                 }
             }
             document.getElementById("Data").innerHTML = text.join("<br><br>");
 
             // CHAR & CHAP
-        } else if (chap !== null && char !== null && lieu === null) {
-            document.getElementById("Character_Name").innerHTML = PersoDatas[char]["Nom"];
+        } else if (CHAP !== null && CHAR !== null && LIEU === null) {
+            document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
             var text = [];
             for (let i = 1; i < PersoDatasColumns.length; i++) {
-                if (PersoDatasColumns[i] === "Numéro" && PersoDatas[char][PersoDatasColumns[i]] !== null) {
+                if (PersoDatasColumns[i] === "Numéro" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
                     continue;
-                } else if (PersoDatasColumns[i] === "Image" && PersoDatas[char][PersoDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + PersoDatas[char][PersoDatasColumns[i]] + "' alt='" + PersoDatas[char]["Nom"] + "'>");
+                } else if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
+                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
                 } else {
-                    result = await Afficher(PersoDatas[char], PersoDatasColumns[i], MainDatas);
+                    result = await Afficher(PersoDatas[CHAR], PersoDatasColumns[i], MainDatas);
                     if (result !== "") {
                         text.push(result);
                     }
@@ -490,17 +571,17 @@ async function general() {
             }
             document.getElementById("Data").innerHTML = text.join("<br><br>");
 
-            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(chap) - 1}&char=${char}">-<br>${parseInt(chap) - 1}</a><a href="index.html?chap=${parseInt(chap) + 1}&char=${char}">+<br>${parseInt(chap) + 1}</a>`;
-        } else if (chap !== null && char === null && lieu !== null) {
-            document.getElementById("Character_Name").innerHTML = LieuDatas[lieu]["Nom"];
+            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(CHAP) - 1}&char=${CHAR}">-<br>${parseInt(CHAP) - 1}</a><a href="index.html?chap=${parseInt(CHAP) + 1}&char=${CHAR}">+<br>${parseInt(CHAP) + 1}</a>`;
+        } else if (CHAP !== null && CHAR === null && LIEU !== null) {
+            document.getElementById("Character_Name").innerHTML = LieuDatas[LIEU]["Nom"];
             var text = [];
             for (let i = 1; i < LieuDatasColumns.length; i++) {
-                if (LieuDatasColumns[i] === "Numéro" && LieuDatas[lieu][LieuDatasColumns[i]] !== null) {
+                if (LieuDatasColumns[i] === "Numéro" && LieuDatas[LIEU][LieuDatasColumns[i]] !== null) {
                     continue;
-                } else if (LieuDatasColumns[i] === "Image" && LieuDatas[lieu][LieuDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + LieuDatas[lieu][LieuDatasColumns[i]] + "' alt='" + LieuDatas[lieu]["Nom"] + "'>");
+                } else if (LieuDatasColumns[i] === "Image" && LieuDatas[LIEU][LieuDatasColumns[i]] !== null) {
+                    text.unshift("<img src='" + LieuDatas[LIEU][LieuDatasColumns[i]] + "' alt='" + LieuDatas[LIEU]["Nom"] + "'>");
                 } else {
-                    result = await Afficher(LieuDatas[lieu], LieuDatasColumns[i], MainDatas);
+                    result = await Afficher(LieuDatas[LIEU], LieuDatasColumns[i], MainDatas);
                     if (result !== "") {
                         text.push(result);
                     }
@@ -510,18 +591,18 @@ async function general() {
             for (let i = 0; i < PersoDatas.length; i++) {
                 if (PersoDatas[i]["Lieu"] !== null) {
                     for (let j = 0; j < PersoDatas[i]["Lieu"].length; j++) {
-                        if (PersoDatas[i]["Lieu"][j][0] === lieu && InTime(PersoDatas[i]["Lieu"][j][1], chap, ChapDatas)) {
+                        if (PersoDatas[i]["Lieu"][j][0] === LIEU && InTime(PersoDatas[i]["Lieu"][j][1], CHAP, ChapDatas)) {
                             if (PersoDatas[i]["Image"] !== null) {
-                                Affichage += `<p><a href="index.html?chap=${chap}&char=${i}"><img class="pitite" src="${PersoDatas[i]["Image"]}">${PersoDatas[i]["Nom"]}</a></p>`;
+                                Affichage += `<p><a href="index.html?chap=${CHAP}&char=${i}"><img class="pitite" src="${PersoDatas[i]["Image"]}">${PersoDatas[i]["Nom"]}</a></p>`;
                             } else {
-                                Affichage += `<p><a href="index.html?chap=${chap}&char=${i}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[i]["Nom"]}</a></p>`;
+                                Affichage += `<p><a href="index.html?chap=${CHAP}&char=${i}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[i]["Nom"]}</a></p>`;
                             }
                         }
                     }
                 }
             }
             text.push(Affichage);
-            if (i === 0) {
+            if (I === 0) {
                 text.push("Aucun");
             }
             text.push("</div>");
@@ -529,7 +610,7 @@ async function general() {
             document.getElementById("Data").innerHTML = text.join("<br><br>");
 
 
-            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(chap) - 1}&lieu=${lieu}">-</a>  <a href="index.html?chap=${parseInt(chap) + 1}&lieu=${lieu}">+</a>`;
+            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(CHAP) - 1}&lieu=${LIEU}">-</a>  <a href="index.html?chap=${parseInt(CHAP) + 1}&lieu=${LIEU}">+</a>`;
         }
     } catch (erreur) {
         console.error(erreur);
