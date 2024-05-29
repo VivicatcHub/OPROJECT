@@ -7,8 +7,8 @@ async function Add(Element, Data) {
     var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
     var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chapter"];
 
-    var Child = Element.parentElement;
-    Element.remove();
+    var Child = Element.parentElement.parentElement;
+    Element.parentElement.remove();
 
     let newElement = document.createElement('div');
     newElement.className = 'oui';
@@ -67,11 +67,17 @@ async function Add(Element, Data) {
             break;
     }
 
-    let button = document.createElement('button');
-    button.textContent = 'Ajouter';
-    button.onclick = function () { Add(this, Data); };
     Child.appendChild(newElement);
-    Child.appendChild(button);
+    let div = document.createElement('div');
+    let button1 = document.createElement('button');
+    button1.textContent = 'Ajouter';
+    button1.onclick = function () { Add(this, Data); };
+    div.appendChild(button1);
+    let button2 = document.createElement('button');
+    button2.textContent = 'Supprimer';
+    button2.onclick = function () { Supp(this); };
+    div.appendChild(button2);
+    Child.appendChild(div);
 }
 
 function Supp(Element) {
@@ -84,19 +90,20 @@ function Supp(Element) {
             return undefined;
         }
     }
-
-    var Child = Element.parentElement;
-    var As = getElementFromEnd(Child.children, -3);
-    if (As) {
-        As.remove();
-    }
+    var Child = Element.parentElement.parentElement;
+    var As = getElementFromEnd(Child.children, -2);
+    As.remove();
     Element.remove();
-
-    // Création d'un nouveau bouton et ajout à Child
-    var newButton = document.createElement('button');
-    newButton.textContent = 'Supprimer';
-    newButton.onclick = function() { Supp(newButton); };
-    Child.appendChild(newButton);
+    let div = document.createElement('div');
+    let button1 = document.createElement('button');
+    button1.textContent = 'Ajouter';
+    button1.onclick = function () { Add(this, Data); };
+    div.appendChild(button1);
+    let button2 = document.createElement('button');
+    button2.textContent = 'Supprimer';
+    button2.onclick = function () { Supp(this); };
+    div.appendChild(button2);
+    Child.appendChild(div);
 }
 
 function ajusterTaille(input) {
@@ -534,7 +541,7 @@ async function modifierPage(C, TYPE) {
             }
         }
         if (compteur > 1) {
-            child.innerHTML += `<button onclick="Add(this, '${MainDatasPast[DATA2[compteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button>`;
+            child.innerHTML += `<div><button onclick="Add(this, '${MainDatasPast[DATA2[compteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></div>`;
         }
         compteur++;
     });
@@ -1126,7 +1133,7 @@ async function generalModif() {
                             });
                             Temp += `</select></div>`;
                         })
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></div></td>`;
                         break;
                 }
             }
@@ -1142,7 +1149,7 @@ async function generalModif() {
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
                     case "Persos":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'></div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this)">Supprimer</button><div></td>`;
                         break;
                 }
             }
