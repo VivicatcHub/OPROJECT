@@ -1149,7 +1149,7 @@ async function generalModif() {
                         Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
                     case "Persos":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'></div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button><div></td>`;
+                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
             }
