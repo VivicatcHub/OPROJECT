@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style: none;
+    overflow-x: clip;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+}
+
+header {
+    box-sizing: content-box;
+    height: 100px;
+    margin-bottom: 10px;
+    width: 100vw;
+    background-color: #2f2f2f;
+}
+
+input {
+    width: 50px;
+}
+
+#naviguer {
+    text-align: center;
+}
+
+#naviguer a {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px solid #000;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #000;
+    text-align: center;
+}
+
+#selectBox,
+#selectBox2 {
+    overflow-y: scroll !important;
+    max-height: 50px;
+}
+
+.navbar {
+    position: absolute;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+.navbar a,
+.navbar p {
+    color: white;
+    cursor: pointer;
+}
+
+.navbar .nav-links {
+    align-items: center;
+}
+
+.navbar .logo {
+    font-size: 2em;
+    font-weight: bold;
+    height: 50px !important;
+}
+
+.navbar .nav-links ul {
+    display: flex;
+}
+
+.navbar .nav-links ul li {
+    margin: 0 25px;
+}
+
+.navbar .menu {
+    color: white;
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 35px;
+}
+
+.nav-links.mobile-menu {
+    margin-left: 0;
+}
+
+@media screen and (max-width: 600px) {
+    .navbar {
+        padding: 0;
+        background-color: antiquewhite;
+    }
+
+    .navbar .logo {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+    }
+
+    .navbar .menu {
+        display: block;
+    }
+
+    .nav-links {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        margin-left: 200%;
+        transition: all 0.5s ease;
+    }
+
+    .nav-links ul {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .navbar .nav-links ul li {
+        margin: 25px 0;
+        font-size: 1.2em;
+    }
+
+    .navbar p,
+    .navbar a {
+        color: black;
+    }
+}
+
+h1 {
+    font-family: "Special_Font", serif;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+img:not(.logo, .pitite) {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 500px;
+    max-height: 500px;
+    border-radius: 25px;
+}
+
+#naviguer {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+div {
+    align-items: center;
+}
+
+p {
+    text-align: center;
+    margin: 5px;
+}
+
+.pitite {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.vu,
+.mentio {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.mentio p,
+.vu p {
+    width: 100px;
+    flex-wrap: wrap;
+}
+
+/* Style pour le tableau */
+.table-container {
+    display: flex;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    overflow-x: auto;
+    margin: 1%;
+    /* Permet le défilement horizontal si le contenu dépasse */
+}
+
+.table-container table {
+    border-collapse: collapse;
+}
+
+
+.table-container th,
+.table-container td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    min-width: 50px;
+    white-space: nowrap;
+}

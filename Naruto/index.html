@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="SpecialStyle.css" />
+    <link rel="stylesheet" href="../Style.css" />
+    <link rel="shortcut icon" type="image/png" href="Logo.png" />
+    <script src="https://kit.fontawesome.com/85ca233acb.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="jquery/les-styles.css">
+    <script src="jquery/jquery-1.12.4.js"></script>
+    <script src="jquery/jquery-ui.js"></script>
+
+    <title>OPROJECT - Naruto</title>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="index.html"><img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Naruto_logo.svg/2560px-Naruto_logo.svg.png"
+                    alt="logo" class="logo"></a>
+            <div class="nav-links">
+                <ul>
+                    <li>
+                        <p id="modifierWhere"><i class="fa-solid fa-thumbtack"></i><br />Avancée</p>
+                    </li>
+                    <li>
+                        <p href="#"><a href="modif.html"><i class="fa-solid fa-pen-nib"></i><br />Modifier</a></p>
+                    </li>
+                </ul>
+            </div>
+            <i class="fa-solid fa-bars fa-2xl menu"></i>
+        </nav>
+    </header>
+
+    <h1 id="Character_Name"></h1>
+    <p id="Data"></p>
+    <div id="naviguer">
+        <div id="barre">
+            <div id="poignee" class="ui-slider-handle"></div><br />
+        </div>
+    </div>
+
+    <script src="Data.js"></script>
+    <script src="../Main.js"></script>
+    <script src="../Chapitre.js"></script>
+    <script>
+        general();
+    </script>
+</body>
+
+</html>
