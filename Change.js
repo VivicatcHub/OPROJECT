@@ -137,7 +137,14 @@ async function Modification(ELEMENT) {
 
 function InDatas(DATA, RANGE) {
     // console.log("RANGE:", RANGE, "DATA:", DATA, "=>", RANGE.some(element => JSON.stringify(element[0]) === JSON.stringify(DATA)));
-    return RANGE.some(element => JSON.stringify(element[0]) === JSON.stringify(DATA));
+    return RANGE.some(element => {
+        // Vérifie si l'élément et DATA sont des tableaux de même longueur
+        if (Array.isArray(element) && Array.isArray(DATA) && element.length === DATA.length) {
+            // Compare chaque élément du tableau
+            return element.every((value, index) => value === DATA[index]);
+        }
+        return false;
+    });
 }
 
 function FirstValueOrOnlyOne(DATA, BOOL) {
@@ -179,43 +186,42 @@ async function ModifierPage(INPUT, TYPE) {
             if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
                 Ligne_Past[Choix][Column[Compteur]].forEach(Data => {
                     let Div = DivOrNot(Type.length, 0, true);
-                    switch (Type[0]) {
-                        case "Info":
-                        case "Infom":
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(Data, Ligne_Act[Choix][Column[Compteur]][0]) === false) {
-                                Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
-                                Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
+                    if (Ligne_Act[Choix][Column[Compteur]] === null || !InDatas(Data, Ligne_Act[Choix][Column[Compteur]][0])) {
+                        switch (Type[0]) {
+                            case "Info":
+                            case "Infom":
+                                    Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
+                                    Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
+                                break;
+                            default:
+                                try {
+                                    let Dico = Dico_Return[Type[0]].map((item, index) => {
+                                        return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                    });
+                                    let Temp = `<div><select>`;
+                                    Object.keys(Dico[0]).forEach(Element => {
+                                        if (Data[0] == Element) {
+                                            Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                        } else {
+                                            Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                        }
+                                    });
+                                    Text_Temp += Temp + `</select>${Div}`;
+                                    break;
+                                } catch (Error) {
+                                    console.log("Erreur,", Type[0], "n'existe pas dans le dico");
+                                }
+                        }
+                        for (let i = 1; i < Type.length; i++) {
+                            let Div = DivOrNot(Type.length, i, true);
+                            switch (Type[i]) {
+                                case "Duree":
+                                    Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
+                                    break;
+                                case "Infos":
+                                    Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i]}">${Div}`;
+                                    break;
                             }
-                            break;
-                        default:
-                            try {
-                                let Dico = Dico_Return[Type[0]].map((item, index) => {
-                                    return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
-                                });
-                                let Temp = `<div><select>`;
-                                Object.keys(Dico[0]).forEach(Element => {
-                                    if (Data[0] == Element) {
-                                        Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
-                                    } else {
-                                        Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text_Temp += Temp + `</select>${Div}`;
-                                break;
-                            } catch (Error) {
-                                console.log("Erreur,", Type[0], "n'existe pas dans le dico");
-                            }
-                            break;
-                    }
-                    for (let i = 1; i < Type.length; i++) {
-                        let Div = DivOrNot(Type.length, i, true);
-                        switch (Type[i]) {
-                            case "Duree":
-                                Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
-                                break;
-                            case "Infos":
-                                Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i]}">${Div}`;
-                                break;
                         }
                     }
                 });
@@ -243,7 +249,7 @@ async function ModifierPage(INPUT, TYPE) {
                                     var Temp = `<div class="oui"><select style="color: red;">`;
                                 }
                                 Object.keys(Dico[0]).forEach(Element => {
-                                    if (Data[0] == Element) {
+                                    if (Data[0][0] == Element) {
                                         Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                                     } else {
                                         Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -251,7 +257,7 @@ async function ModifierPage(INPUT, TYPE) {
                                 });
                                 Text_Temp += Temp + `</select>`;
                                 if (Array.isArray(Data[0])) {
-                                    Text_Temp += '${Div}';
+                                    Text_Temp += `${Div}`;
                                 }
                                 break;
                             } catch (Error) {
@@ -288,13 +294,13 @@ async function ModifierPage(INPUT, TYPE) {
                             break;
                         default:
                             try {
-                                if (Array.isArray(Data[0])) {
+                                if (Array.isArray(Data[1])) {
                                     let Dico = Dico_Return[Type[0]].map((item, index) => {
                                         return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
                                     });
                                     let Temp = `=><select data-score="SS">`;
                                     Object.keys(Dico[0]).forEach(Element => {
-                                        if (Data[0] == Element) {
+                                        if (Data[1][0] == Element) {
                                             Temp += `<option style="color: red;" selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                                         } else {
                                             Temp += `<option style="color: red;" value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -304,7 +310,7 @@ async function ModifierPage(INPUT, TYPE) {
                                 }
                                 break;
                             } catch (Error) {
-                                console.log("Erreur,", D, "n'existe pas dans le dico");
+                                console.log("Erreur,", Type[0], "n'existe pas dans le dico");
                             }
                             break;
                     }
@@ -312,13 +318,13 @@ async function ModifierPage(INPUT, TYPE) {
                         let Div = DivOrNot(Type.length, i, false);
                         switch (Type[i]) {
                             case "Duree":
-                                if (Array.isArray(Data[i])) {
-                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i][1].split("-")[0]}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i][1].split("-")[1]}"></input>${Div}`;
+                                if (Array.isArray(Data[1])) {
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[1][i].split("-")[0]}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[1][i].split("-")[1]}"></input>${Div}`;
                                 }
                                 break;
                             case "Infos":
-                                if (Array.isArray(Data[0])) {
-                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i]}"></input>${Div}`;
+                                if (Array.isArray(Data[1])) {
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[1][i]}"></input>${Div}`;
                                 }
                                 break;
                         }
@@ -404,7 +410,6 @@ function Transfo() {
                                     Compteur[1] = 0;
                                     Text = Text.slice(0, -1) +  "=>" + Mini_Child.value + End(Compteur[1], Type);
                                 } else {
-                                    console.log(Mini_Child.value);
                                     Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[2], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
                                     }
                                 Compteur[0]++;
@@ -440,7 +445,6 @@ async function DatasVictorySpe(WHERE) {
         LISTE.push(ele);
     })
     var modif = localStorage.getItem('ModifSpe');
-    console.log(modif, "spe");
     if (modif === 'true' || modif) {
         try {
             var Dico = {};
@@ -561,7 +565,6 @@ async function DatasVictorySpe2(WHERE) {
     })
     // console.log(LISTE);
     var modif = localStorage.getItem('ModifSpe2');
-    console.log(modif, "spe2");
     WHERE = String(Number(WHERE) - 1);
     if (modif === 'true' || modif) {
         try {

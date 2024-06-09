@@ -180,6 +180,12 @@ async function DatasRange() {
                 // console.log(element);
                 Datas[element.c[0].v] = element.c[1].v;
             })
+            // Supprimer la base de données existante
+            indexedDB.deleteDatabase(`MaBaseDeDonnees${ANIME}_General`);
+
+            // Réinitialiser la variable locale II à 1
+            II = 1;
+            localStorage.setItem('II', II);
             // console.log("datas:", Datas);
             var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, II);
 
