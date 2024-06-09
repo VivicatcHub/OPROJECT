@@ -25,16 +25,16 @@ async function Add(ELEMENT, TYPE) {
         switch (D) {
             case "Info":
             case "Infom":
-                Text_Temp += '<input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>';
+                Text_Temp += '<input style="color: red;" oninput="AjusterTaille(this)" type="text"></input>';
                 break;
             case "Infos":
-                Text_Temp += ' | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>';
+                Text_Temp += ' | <input style="color: red;" oninput="AjusterTaille(this)" type="text"></input>';
                 break;
             case "Duree":
-                Text_Temp += ' | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>';
+                Text_Temp += ' | <input style="color: red;" oninput="AjusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text"></input>';
                 break;
             case "Date":
-                Text_Temp += '<input style="color: red;" oninput="ajusterTaille(this)" type="date"></input>';
+                Text_Temp += '<input style="color: red;" oninput="AjusterTaille(this)" type="date"></input>';
                 break;
             default:
                 try {
@@ -101,16 +101,16 @@ async function Modification(ELEMENT) {
             case "Info":
             case "Infom":
                 Parent.className = "oui";
-                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
+                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
                 break;
             case "Infos":
-                Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
+                Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
                 break;
             case "Duree":
-                Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur + 1].value}"></input>`;
+                Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur + 1].value}"></input>`;
                 break;
             case "Date":
-                Text_Temp += `=><input style="color: red;" oninput="ajusterTaille(this)" type="date" value="${Liste[Compteur].value}"></input>`;
+                Text_Temp += `=><input style="color: red;" oninput="AjusterTaille(this)" type="date" value="${Liste[Compteur].value}"></input>`;
                 break;
             default:
                 try {
@@ -183,7 +183,7 @@ async function ModifierPage(INPUT, TYPE) {
                         case "Infom":
                             if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(Data, Ligne_Act[Choix][Column[Compteur]][0]) === false) {
                                 Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
-                                Text_Temp += `<div><input oninput="ajusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
+                                Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -210,10 +210,10 @@ async function ModifierPage(INPUT, TYPE) {
                         let Div = DivOrNot(Type.length, i, true);
                         switch (Type[i]) {
                             case "Duree":
-                                Text_Temp += ` | <input oninput="ajusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
+                                Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
                                 break;
                             case "Infos":
-                                Text_Temp += ` | <input oninput="ajusterTaille(this)" type="text" value="${Data[i]}">${Div}`;
+                                Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i]}">${Div}`;
                                 break;
                         }
                     }
@@ -227,9 +227,9 @@ async function ModifierPage(INPUT, TYPE) {
                         case "Infom":
                             console.log(Data)
                             if (Array.isArray(Data[0])) {
-                                Text_Temp += `<div class="oui"><input oninput="ajusterTaille(this)" type="text" value="${Data[1][0]}"></input>`;
+                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[1][0]}"></input>`;
                             } else {
-                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -264,16 +264,16 @@ async function ModifierPage(INPUT, TYPE) {
                         switch (Type[i]) {
                             case "Duree":
                                 if (Array.isArray(Data[0])) {
-                                    Text_Temp += ` | <input oninput="ajusterTaille(this)" type="text" value="${Data[0][i].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${Data[0][i].split("-")[1]}"></input>`;
+                                    Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[0][i].split("-")[0]}"></input> - <input oninput="AjusterTaille(this)" type="text" value="${Data[0][i].split("-")[1]}"></input>`;
                                 } else {
-                                    Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[0]}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i].split("-")[1]}"></input>${Div}`;
                                 }
                                 break;
                             case "Infos":
                                 if (Array.isArray(Data[0])) {
-                                    Text_Temp += ` | <input oninput="ajusterTaille(this)" type="text" value="${Data[0][i]}"></input>`;
+                                    Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[0][i]}"></input>`;
                                 } else {
-                                    Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i]}"></input>${Div}`;
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i]}"></input>${Div}`;
                                 }
                                 break;
                         }
@@ -283,7 +283,7 @@ async function ModifierPage(INPUT, TYPE) {
                         case "Info":
                         case "Infom":
                             if (Array.isArray(Data[0])) {
-                                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[1][0]}"></input>${Div}`;
+                                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[1][0]}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -313,12 +313,12 @@ async function ModifierPage(INPUT, TYPE) {
                         switch (Type[i]) {
                             case "Duree":
                                 if (Array.isArray(Data[i])) {
-                                    Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i][1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i][1].split("-")[1]}"></input>${Div}`;
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i][1].split("-")[0]}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i][1].split("-")[1]}"></input>${Div}`;
                                 }
                                 break;
                             case "Infos":
                                 if (Array.isArray(Data[0])) {
-                                    Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Data[i]}"></input>${Div}`;
+                                    Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[i]}"></input>${Div}`;
                                 }
                                 break;
                         }
@@ -724,7 +724,7 @@ async function GeneralModif() {
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Perso":
                         Temp = "";
@@ -759,7 +759,7 @@ async function GeneralModif() {
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
                     case "Perso":
                         Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div><button onclick="Add(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Supprimer</button></div></td>`;
