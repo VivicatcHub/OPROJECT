@@ -227,9 +227,9 @@ async function ModifierPage(INPUT, TYPE) {
                         case "Info":
                         case "Infom":
                             if (Array.isArray(Data[0])) {
-                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[0][0]}"></input>`;
+                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>`;
                             } else {
-                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -434,19 +434,20 @@ function Transfo() {
 
 async function DatasVictorySpe(WHERE) {
     let DATAS_RANGE = await DatasRange();
+    console.log(DATAS_RANGE)
     var LISTE = [];
     Object.keys(DATAS_RANGE).forEach(ele => {
         LISTE.push(ele);
     })
     var modif = localStorage.getItem('ModifSpe');
-    if (modif === 'true') {
+    console.log(modif, "spe");
+    if (modif === 'true' || modif) {
         try {
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element, true);
             });
             await Promise.all(promises); // Attendre que toutes les promesses se terminent
-            // console.log(Dico);
 
             // console.log(dico);
 
@@ -560,8 +561,9 @@ async function DatasVictorySpe2(WHERE) {
     })
     // console.log(LISTE);
     var modif = localStorage.getItem('ModifSpe2');
+    console.log(modif, "spe2");
     WHERE = String(Number(WHERE) - 1);
-    if (modif === 'true') {
+    if (modif === 'true' || modif) {
         try {
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses

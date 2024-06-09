@@ -15,6 +15,7 @@ boutonModifierWhere.addEventListener("click", () => {
         // Stocker la nouvelle valeur dans le localStorage avec la clé 'nom'
         localStorage.setItem(`Where${ANIME}`, nouvelleValeur);
         localStorage.setItem("Modif", true);
+        localStorage.setItem("ModifSpe", true);
         // Afficher un message pour confirmer que la valeur a été modifiée
         alert(
             "La valeur a été modifiée avec succès ! Nouvelle valeur : " +

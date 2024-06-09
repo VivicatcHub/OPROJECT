@@ -181,7 +181,7 @@ async function DatasRange() {
                 Datas[element.c[0].v] = element.c[1].v;
             })
             // console.log("datas:", Datas);
-            var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, 1);
+            var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, II);
 
             Request.onupgradeneeded = function (event) {
                 var Db = event.target.result;
@@ -213,7 +213,7 @@ async function DatasRange() {
     } else {
         try {
             var Promesse = new Promise(function (Resolve, Reject) {
-                var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, 1);
+                var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_General`, II);
 
                 Request.onsuccess = function (event) {
                     var Db = event.target.result; // Obtention de la référence à la base de données ouverte
@@ -275,9 +275,9 @@ function WhereOrNot(TYPE, WHERE) {
     }
 }
 
-async function DatasVictory(WHERE, SPE, Datas) {
+async function DatasVictory(WHERE, SPE, DATAS) {
     var LISTE = [];
-    Object.keys(Datas).forEach(ele => {
+    Object.keys(DATAS).forEach(ele => {
         LISTE.push(ele);
     })
     var MODIF = localStorage.getItem('Modif');
@@ -285,7 +285,7 @@ async function DatasVictory(WHERE, SPE, Datas) {
         try {
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
-                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, Datas[Element], false), await WhereOrNot(Element, WHERE), Element);
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS[Element], false), await WhereOrNot(Element, WHERE), Element);
             });
             await Promise.all(promises); // Attendre que toutes les promesses se terminent
             console.log(Dico);
@@ -326,9 +326,10 @@ async function DatasVictory(WHERE, SPE, Datas) {
         } catch (error) {
             console.error('Une erreur est survenue :', error);
         }
-
-        MODIF = false;
-        localStorage.setItem('Modif', MODIF);
+        if (!SPE) {
+            MODIF = false;
+            localStorage.setItem('Modif', MODIF);
+        }
     }
     else {
         var Dico = {};
@@ -379,7 +380,7 @@ async function DatasVictory(WHERE, SPE, Datas) {
             console.error('Une erreur est survenue :', error);
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
-                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, Datas[Element], false), await WhereOrNot(Element, WHERE), Element);
+                Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS[Element], false), await WhereOrNot(Element, WHERE), Element);
             });
             await Promise.all(promises); // Attendre que toutes les promesses se terminent
             console.log(Dico);
