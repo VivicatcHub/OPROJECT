@@ -91,6 +91,7 @@ async function Modification(ELEMENT) {
     // console.log(Element, Data);
     var Parent = ELEMENT.parentElement;
     let Liste = Array.from(ELEMENT.parentElement.children);
+    ELEMENT.parentElement.className = "oui";
     ELEMENT.remove();
     var Type = Parent.parentElement.getAttribute('data-score');
     var Text_Temp = "";
@@ -110,12 +111,12 @@ async function Modification(ELEMENT) {
                 Text_Temp += ` | <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input> - <input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur + 1].value}"></input>`;
                 break;
             case "Date":
-                Text_Temp += `=><input style="color: red;" oninput="AjusterTaille(this)" type="date" value="${Liste[Compteur].value}"></input>`;
+                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="AjusterTaille(this)" type="date" value="${Liste[Compteur].value}"></input>`;
                 break;
             default:
                 try {
                     let Dico = Dico_Return_Past[D];
-                    let Temp = `=><select style="color: red;">`;
+                    let Temp = `=><select data-score="SS" style="color: red;">`;
                     Object.keys(Dico[0]).forEach(Element => {
                         if (Element ===  Liste[Compteur].value) {
                             Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -225,9 +226,8 @@ async function ModifierPage(INPUT, TYPE) {
                     switch (Type[0]) {
                         case "Info":
                         case "Infom":
-                            console.log(Data)
                             if (Array.isArray(Data[0])) {
-                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[1][0]}"></input>`;
+                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[0][0]}"></input>`;
                             } else {
                                 Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
                             }
@@ -357,7 +357,7 @@ async function ModifierPage(INPUT, TYPE) {
 }
 
 function Plus(NUM, BOOL, INT, COMPT) {
-    if ((NUM === 0 || (BOOL === true && INT === 0)) && COMPT !== 7) {
+    if (NUM === 0 && BOOL !== true && COMPT !== 7 && INT !== 0) {
         return "+";
     } else {
         return "";
@@ -390,7 +390,7 @@ function Transfo() {
                     break;
                 }
                 var Text = "";
-                var Compteur = [0, 0];
+                var Compteur = [0, 0, 0];
                 if (Cell.getAttribute('data-score') !== null) {
                     var Type = Cell.getAttribute('data-score').split("|");
                 } else {
@@ -399,12 +399,14 @@ function Transfo() {
                 Cell.querySelectorAll('div').forEach(function (Child) {
                     Child.querySelectorAll('select, input[type="text"]').forEach(function (Mini_Child) {
                         if (Child.className === "oui") {
-                            if (Compteur[0] < Type.length || Type[Compteur - 1] === "Duree") {
+                            if (Compteur[0] < Type.length || Type[Compteur - 1] === "Duree" || Mini_Child.getAttribute("data-score") === "SS") {
                                 if (Mini_Child.getAttribute("data-score") === "SS") {
-                                    Text = "=>" + Mini_Child.value + End(Compteur[1], Type);
+                                    Compteur[1] = 0;
+                                    Text = Text.slice(0, -1) +  "=>" + Mini_Child.value + End(Compteur[1], Type);
                                 } else {
-                                    Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[0], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
-                                }
+                                    console.log(Mini_Child.value);
+                                    Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[2], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
+                                    }
                                 Compteur[0]++;
                             } else if (Compteur[0] === Type.length) {
                                 Text += Mini_Child.value + "\\"
@@ -413,7 +415,9 @@ function Transfo() {
                         }
                         Compteur[1]++;
                     });
-                    Compteur = [0, 0]
+                    Compteur[0] = 0;
+                    Compteur[1] = 0;
+                    Compteur[2]++;
                 });
                 if (Text.length > 0 && Text[0] === "+") {
                     Cell.innerHTML = '="' + Text.slice(0, -1) + '"';

@@ -304,7 +304,7 @@ async function DatasVictory(WHERE, SPE, Datas) {
                         var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
                         var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
                         Data = Dico[Element]; // Ajouter l'objet à l'objet store
-                        console.log("Data:", Data, Element);
+                        // console.log("Data:", Data, Element);
                         Data["id"] = 1;
                         var NewRequest = ObjectStore.put(Data);
 
