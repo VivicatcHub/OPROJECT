@@ -223,7 +223,7 @@ async function DatasRange() {
 
                     GetRequest.onsuccess = function (event) {
                         Datas = GetRequest.result;
-                        console.log("Récupération réussie pour: Général")
+                        // console.log("Récupération réussie pour : Général")
                         delete Datas.id;
                         Resolve(Datas);
                     };
@@ -346,7 +346,7 @@ async function DatasVictory(WHERE, SPE, Datas) {
 
                         GetRequest.onsuccess = function (event) {
                             Dico[Element] = GetRequest.result;
-                            console.log("Récupération réussie pour :", Element)
+                            // console.log("Récupération réussie pour :", Element)
                             Resolve();
                         };
 

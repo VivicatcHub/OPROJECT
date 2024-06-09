@@ -20,8 +20,8 @@ async function Add(ELEMENT, TYPE) {
     New_Element.className = 'oui';
     // console.log(Data);
     var Text_Temp = "";
-    TYPE = TYPE.split("|");
-    TYPE.forEach(D => {
+    let Type = TYPE.split("|");
+    Type.forEach(D => {
         switch (D) {
             case "Info":
             case "Infom":
