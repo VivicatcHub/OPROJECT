@@ -390,16 +390,16 @@ async function DatasVictory(WHERE, SPE, Datas) {
     return Dico;
 }
 
-async function general() {
+async function General() {
     async function Afficher(TYPE, DATA, MAIN) {
         if (TYPE[DATA] === null || MAIN[DATA] === undefined) {
             return "";
         } else {
             if (MAIN[DATA] == "Info") {
                 return DATA + ":<br>" + TYPE[DATA];
-            } else if (MAIN[DATA].includes("\\")) {
+            } else if (MAIN[DATA].includes("|")) {
                 let Affichage = [];
-                if (MAIN[DATA] == "Info\\Duree") {
+                if (MAIN[DATA] == "Info|Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
                         if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
                             Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0]);
@@ -407,7 +407,7 @@ async function general() {
                             Affichage.push(TYPE[DATA][l][0]);
                         }
                     }
-                } else if (MAIN[DATA] == "Info\\Infos\\Duree") {
+                } else if (MAIN[DATA] == "Info|Infos|Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
                         if (InTime(TYPE[DATA][l][2], CHAP, ChapDatas) && Affichage[0] === undefined) {
                             Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
@@ -415,7 +415,7 @@ async function general() {
                             Affichage.push(TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
                         }
                     }
-                } else if (MAIN[DATA] == "Lieu\\Duree") {
+                } else if (MAIN[DATA] == "Lieu|Duree") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
                         if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
                             Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
@@ -423,7 +423,7 @@ async function general() {
                             Affichage.push("<a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
                         }
                     }
-                } else if (MAIN[DATA] == "Perso\\Infos") {
+                } else if (MAIN[DATA] == "Perso|Infos") {
                     for (let l = 0; l < TYPE[DATA].length; l++) {
                         if (Affichage[0] === undefined) {
                             Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");

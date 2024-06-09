@@ -90,32 +90,38 @@ async function Modification(ELEMENT) {
     let Dico_Return_Past = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
     // console.log(Element, Data);
     var Parent = ELEMENT.parentElement;
+    let Liste = Array.from(ELEMENT.parentElement.children);
     ELEMENT.remove();
     var Type = Parent.parentElement.getAttribute('data-score');
     var Text_Temp = "";
+    var Compteur = 0;
     Type = Type.split("|");
     Type.forEach(D => {
         switch (D) {
             case "Info":
             case "Infom":
                 Parent.className = "oui";
-                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text"></input>`;
+                Text_Temp += `=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
                 break;
             case "Infos":
-                Text_Temp += ' | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>';
+                Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
                 break;
             case "Duree":
-                Text_Temp += ' | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input>';
+                Text_Temp += ` | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Liste[Compteur + 1].value}"></input>`;
                 break;
             case "Date":
-                Text_Temp += '=><input style="color: red;" oninput="ajusterTaille(this)" type="date"></input>';
+                Text_Temp += `=><input style="color: red;" oninput="ajusterTaille(this)" type="date" value="${Liste[Compteur].value}"></input>`;
                 break;
             default:
                 try {
                     let Dico = Dico_Return_Past[D];
                     let Temp = `=><select style="color: red;">`;
                     Object.keys(Dico[0]).forEach(Element => {
-                        Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                        if (Element ===  Liste[Compteur].value) {
+                            Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                        } else {
+                            Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                        }
                     });
                     Text_Temp += Temp + `</select>`;
                     break;
@@ -123,6 +129,7 @@ async function Modification(ELEMENT) {
                     console.log("Erreur,", D, "n'existe pas dans le dico");
                 }
         }
+        Compteur++;
     });
     Parent.innerHTML += Text_Temp;
 }
@@ -155,36 +162,19 @@ function DivOrNot(BOOL, I, BUTTON) {
 async function ModifierPage(INPUT, TYPE) {
     var Choix = INPUT.value;
     var Ligne = INPUT.parentElement.parentElement;
+    let Datas_Range = await DatasRange();
     let Dico_Return_Past = await DatasVictorySpe2(localStorage.getItem(`Where${ANIME}`));
-    // console.log(dicoReturPast);
-    var Main_Datas_Past = Dico_Return_Past["Main"];
-    var [PersoDatasPast, PersoDatasColumnsPast] = Dico_Return_Past["Perso"];
-    var [LieuDatasPast, LieuDatasColumnsPast] = Dico_Return_Past["Lieu"];
-    var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = Dico_Return_Past["Appartenance"];
-
     let Dico_Return = await DatasVictorySpe(localStorage.getItem(`Where${ANIME}`));
-    // console.log("dicoReturn", dicoReturn, localStorage.getItem(`Where${ANIME}`));
-    var PersoDatas = Dico_Return["Perso"][0];
-    var LieuDatas = Dico_Return["Lieu"][0];
-    var AppartenanceDatas = Dico_Return["Appartenance"][0];
-
-    // console.log(TYPE)
-    var [DATA1, DATA2, DATA3] = {
-        "Perso": [PersoDatasPast, PersoDatasColumnsPast, PersoDatas],
-        "Lieu": [LieuDatasPast, LieuDatasColumnsPast, LieuDatas],
-        "Appartenance": [AppartenanceDatasPast, AppartenanceDatasColumnsPast, AppartenanceDatas]
-    }[TYPE];
-
     var Compteur = 0;
+    let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
+    let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
-        let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
-        let Ligne_Act = Dico_Return[TYPE][0];
         // console.log("compteur:", compteur, "choix:", choix, "Ligne_Past:", Ligne_Past, "Ligne_Past[choix][Column[compteur]]:", Ligne_Past[choix][Column[compteur]], "Ligne_Act:", Ligne_Act, "Ligne_Act[choix][Column[compteur]]:", Ligne_Act[choix][Column[compteur]]);
         if (Compteur === 1) {
             Child.innerHTML = Choix;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
-            let Type = Main_Datas_Past[Column[Compteur]].split("|");
+            let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
             if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
                 Ligne_Past[Choix][Column[Compteur]].forEach(Data => {
                     let Div = DivOrNot(Type.length, 0, true);
@@ -198,7 +188,9 @@ async function ModifierPage(INPUT, TYPE) {
                             break;
                         default:
                             try {
-                                let Dico = Dico_Return_Past[Type[0]];
+                                let Dico = Dico_Return[Type[0]].map((item, index) => {
+                                    return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                });
                                 let Temp = `<div><select>`;
                                 Object.keys(Dico[0]).forEach(Element => {
                                     if (Data[0] == Element) {
@@ -242,15 +234,20 @@ async function ModifierPage(INPUT, TYPE) {
                             break;
                         default:
                             try {
-                                let Dico = Dico_Return[Type[0]];
+                                let Dico = Dico_Return[Type[0]].map((item, index) => {
+                                    return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                });
                                 if (Array.isArray(Data[0])) {
                                     var Temp = `<div class="oui"><select>`;
                                 } else {
                                     var Temp = `<div class="oui"><select style="color: red;">`;
                                 }
                                 Object.keys(Dico[0]).forEach(Element => {
-                                    console.log(Data, Array.isArray(Data))
-                                    Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                    if (Data[0] == Element) {
+                                        Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                    } else {
+                                        Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                    }
                                 });
                                 Text_Temp += Temp + `</select>`;
                                 if (Array.isArray(Data[0])) {
@@ -292,10 +289,16 @@ async function ModifierPage(INPUT, TYPE) {
                         default:
                             try {
                                 if (Array.isArray(Data[0])) {
-                                    let Dico = Dico_Return_Past[Type[0]];
+                                    let Dico = Dico_Return[Type[0]].map((item, index) => {
+                                        return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                    });
                                     let Temp = `=><select data-score="SS">`;
                                     Object.keys(Dico[0]).forEach(Element => {
-                                        Temp += `<option style="color: red;" value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                        if (Data[0] == Element) {
+                                            Temp += `<option style="color: red;" selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                        } else {
+                                            Temp += `<option style="color: red;" value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                        }
                                     });
                                     Text_Temp += Temp + `</select>${Div}`;
                                 }
@@ -323,578 +326,99 @@ async function ModifierPage(INPUT, TYPE) {
                 });
             }
             Child.innerHTML += Text_Temp;
-            /*
-            switch (Main_Datas_Past[Column[Compteur]]) {
-                case "Infom":
-                case "Info":
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data:", data, "Ligne_Act[choix][Column[compteur]]:", Ligne_Act[choix][Column[compteur]]);
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]][0]) === false) {
-                                Child.innerHTML += `<div><input oninput="ajusterTaille(this)" type="text" value="${data}"></input><button onclick="Modification(this)">Modif</button></div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Child.innerHTML += `<div class="oui"><input oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input>=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input></div>`;
-                            } else {
-                                Child.innerHTML += `<div class="oui"><input oninput="ajusterTaille(this)" type="text" value="${data}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Info\\Duree":
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Child.innerHTML += `<div><input oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Child.innerHTML += `<div class="oui"><input oninput="ajusterTaille(this)" type="text" value="${data[0][0]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[1]}"></input>=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][0]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[1]}"></input></div>`;
-                            } else {
-                                Child.innerHTML += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Info\\Infos\\Duree":
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Child.innerHTML += `<div><input oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Child.innerHTML += `<div class="oui"><input oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input> | <input oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[1]}"></input>=><input data-score="SS" style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[1]}"></input></div>`;
-                            } else {
-                                Child.innerHTML += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[0]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[2].split("-")[1]}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Lieu\\Duree":
-                    TempLieu = { ...LieuDatas, ...LieuDatasPast };
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Text = `<div><select>`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                // console.log("data", data);
-                                Child.innerHTML += Text + `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Text = `<div class="oui"><select>`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text += `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[1]}"></input>=><select data-score="SS" style="color: red;">`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[1][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[1]}"></input></div>`;
-                            } else {
-                                Text = `<div class="oui"><select style="color: red;">`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Perso\\Infos":
-                    TempPerso = { ...PersoDatas, ...PersoDatasPast }
-                    // console.log(TempPerso);
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Text = `<div><select>`;
-                                // console.log("data", data);
-                                Object.keys(TempPerso).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Text = `<div class="oui"><select>`;
-                                // console.log("data", data);
-                                Object.keys(TempPerso).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text += `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input><select data-score="SS" style="color: red;">`;
-                                // console.log("data", data);
-                                Object.keys(TempPerso).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input></div>`;
-                            } else {
-                                Text = `<div class="oui"><select style="color: red;">`;
-                                // console.log("data", data);
-                                Object.keys(TempPerso).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempPerso[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1]}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Lieu":
-                    TempLieu = { ...LieuDatas, ...LieuDatasPast };
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Text = `<div><select>`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                // console.log("data", data);
-                                Child.innerHTML += Text + `</select><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Text = `<div class="oui"><select>`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text += `</select>=><select data-score="SS" style="color: red;">`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[1][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select></div>`;
-                            } else {
-                                Text = `<div class="oui"><select style="color: red;">`;
-                                Object.keys(TempLieu).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempLieu[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Appartenance":
-                    TempApp = { ...AppartenanceDatas, ...AppartenanceDatasPast };
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Text = `<div><select>`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                // console.log("data", data);
-                                Child.innerHTML += Text + `</select><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Text = `<div class="oui"><select>`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text += `</select>=><select data-score="SS" style="color: red;">`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[1][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select></div>`;
-                            } else {
-                                Text = `<div class="oui"><select style="color: red;">`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select></div>`;
-                            }
-                        });
-                    }
-                    break;
-                case "Appartenance\\Duree":
-                    TempApp = { ...AppartenanceDatas, ...AppartenanceDatasPast };
-                    if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
-                        Ligne_Past[Choix][Column[Compteur]].forEach(data => {
-                            if (Ligne_Act[Choix] === undefined || Ligne_Act[Choix][Column[Compteur]] === null || InDatas(data, Ligne_Act[Choix][Column[Compteur]]) === false) {
-                                Text = `<div><select>`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                // console.log("data", data);
-                                Child.innerHTML += Text + `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input><button onclick="Modification(this)">Modif</button</div>`;
-                            }
-                        });
-                    }
-                    if (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null) {
-                        Ligne_Act[Choix][Column[Compteur]].forEach(data => {
-                            // console.log("data", data);
-                            if (Array.isArray(data[0])) {
-                                Text = `<div class="oui"><select>`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Text += `</select> | <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[0]}"></input> - <input oninput="ajusterTaille(this)" type="text" value="${data[0][1].split("-")[1]}"></input>=><select data-score="SS" style="color: red;">`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[1][0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1][1].split("-")[1]}"></input></div>`;
-                            } else {
-                                Text = `<div class="oui"><select style="color: red;">`;
-                                Object.keys(TempApp).forEach(element => {
-                                    if (element === data[0]) {
-                                        Text += `<option value="${element}" selected>${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    } else {
-                                        Text += `<option value="${element}">${element} - ${TempApp[element]["Nom"]}</option>`;
-                                    }
-                                });
-                                Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[0]}"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${data[1].split("-")[1]}"></input></div>`;
-                            }
-                        });
-                    }
-                    break;
-            }
-            */
-        } else {
-            switch (Main_Datas_Past[Column[Compteur]]) {
-                case "Info":
-                case "Infom":
-                    Child.innerHTML += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-                case "Info\Duree":
-                    Child.innerHTML += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-                case "Info\Infos\Duree":
-                    Child.innerHTML += `<div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-                case "Lieu\Duree":
-                    Text = `<div class="oui"><select style="color: red;">`;
-                    Object.keys(LieuDatasPast).forEach(element => {
-                        Text += `<option value="${element}">${element} - ${LieuDatasPast[element]["Nom"]}</option>`;
-                    });
-                    Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-                case "Perso\Infos":
-                    Text = `<div class="oui"><select style="color: red;">`;
-                    Object.keys(PersoDatasPast).forEach(element => {
-                        Text += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
-                    });
-                    Child.innerHTML += Text + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-                case "Lieu":
-                    Text = `<div class="oui"><select style="color: red;">`;
-                    Object.keys(LieuDatasPast).forEach(element => {
-                        Text += `<option value="${element}">${element} - ${LieuDatasPast[element]["Nom"]}</option>`;
-                    });
-                    Child.innerHTML += Text + `</select></div>`;
-                    break;
-                case "Appartenance":
-                    Text = `<div class="oui"><select style="color: red;">`;
-                    Object.keys(AppartenanceDatasPast).forEach(element => {
-                        Text += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
-                    });
-                    Child.innerHTML += Text + `</select></div>`;
-                    break;
-                case "Appartenance\Duree":
-                    let TempAppa = `<div class="oui"><select style="color: red;">`;
-                    Object.keys(AppartenanceDatasPast).forEach(element => {
-                        TempAppa += `<option value="${element}">${element} - ${AppartenanceDatasPast[element]["Nom"]}</option>`;
-                    });
-                    Child.innerHTML = TempAppa + `</select> | <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input> - <input style="color: red;" oninput="ajusterTaille(this)" type="text"></input></div>`;
-                    break;
-            }
         }
         if (Compteur > 1) {
-            Child.innerHTML += `<div><button onclick="Add(this, '${Main_Datas_Past[DATA2[Compteur]]}')">Ajouter</button><button onclick="Supp(this, '${Main_Datas_Past[DATA2[Compteur]]}')">Supprimer</button></div>`;
+            Child.innerHTML += `<div><button onclick="Add(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Ajouter</button><button onclick="Supp(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Supprimer</button></div>`;
         }
         Compteur++;
     });
-    let DATAS_RANGE = await DatasRange();
-    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
-    // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem(`Where${ANIME}`));
-    var Main_Datas_Past = dicoReturnPast["Main"];
-    var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
-    var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
-    var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
-
-    [DATA1, DATA2] = {
-        "Perso": [PersoDatasPast, PersoDatasColumnsPast],
-        "Lieu": [LieuDatasPast, LieuDatasColumnsPast],
-        "Appartenance": [AppartenanceDatasPast, AppartenanceDatasColumnsPast]
-    }[TYPE];
-
     var table = Ligne.parentElement.parentElement.getElementsByTagName('tbody')[0];
     var newRow = table.insertRow();
+    Dico_Return = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
+    Ligne_Past = Dico_Return[TYPE][0];
     Compteur = [0, table.rows.length];
     newRow.id = `${Compteur[1]}`
     Text = ``;
-    DATA2.forEach(element => {
+    Column.forEach(() => {
         if (Compteur[0] === 0) {
             Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
         } else if (Compteur[0] === 1) {
             Text += `<td><select id="numero" name="numero" onchange="ModifierPage(this, '${TYPE}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
-            Object.keys(DATA1).forEach(element => {
-                Text += `<option value="${element}">${element} - ${DATA1[element]["Nom"]}</option>`;
+            Object.keys(Ligne_Past).forEach(element => {
+                Text += `<option value="${element}">${element} - ${Ligne_Past[element]["Nom"]}</option>`;
             });
             Text += `</select></td>`;
         } else {
-            Text += `<td data-score="${Main_Datas_Past[DATA2[Compteur[0]]]}"></td>`;
+            Text += `<td data-score="${Dico_Return_Past["Main"][Column[Compteur[0]]]}"></td>`;
         }
         Compteur = [Compteur[0] + 1, Compteur[1]];
     });
     newRow.innerHTML = Text;
 }
 
-function Transfo() {
-    function Plus(NUM, BOOL) {
-        if (NUM === 0 || BOOL === true) {
-            return "";
-        } else {
-            return "+";
-        }
+function Plus(NUM, BOOL, INT, COMPT) {
+    if ((NUM === 0 || (BOOL === true && INT === 0)) && COMPT !== 7) {
+        return "+";
+    } else {
+        return "";
     }
+}
 
+function End(NUM, DATA) {
+    if (DATA[NUM] === "Duree") {
+        return "-";
+    } else if(DATA.length > NUM) {
+        return ",";
+    } else {
+        return "";
+    }
+}
+
+function Transfo() {
     Xompteur = 0;
     document.querySelectorAll('table').forEach(table => {
-        if (Xompteur === 3) {
+        if (Xompteur === 7) {
             Vi = 0;
             Vj = 1;
         } else {
             Vi = 1;
             Vj = 0;
         }
-        for (var I = 0; I < table.rows.length - Vi; I++) {
-            for (var j = 2 - Vj, cell; cell = table.rows[I].cells[j]; j++) {
-                // console.log(cell.innerHTML);
-                if (j === 2 && cell.innerHTML.includes("<input") === false) {
+        for (var i = 0; i < table.rows.length - Vi; i++) {
+            for (var j = 2 - Vj, Cell; Cell = table.rows[i].cells[j]; j++) {
+                if (j === (2 - Vj) && Cell.innerHTML.includes("<input") === false) {
                     break;
                 }
-                switch (cell.getAttribute('data-score')) {
-                    case "Info":
-                    case "This":
-                    case "Appartenance":
-                    case "Lieu":
-                    case "Infom":
-                        Text = ""
-                        compteur = 0;
-                        cell.querySelectorAll('input[type="text"], select').forEach(function (child) {
-                            if (child.parentElement.className === "oui") {
-                                if (child.getAttribute('data-score') === "SS") {
-                                    Text = Text.slice(0, -1) + "=>" + child.value + "\\";
+                var Text = "";
+                var Compteur = [0, 0];
+                if (Cell.getAttribute('data-score') !== null) {
+                    var Type = Cell.getAttribute('data-score').split("|");
+                } else {
+                    var Type = null;
+                }
+                Cell.querySelectorAll('div').forEach(function (Child) {
+                    Child.querySelectorAll('select, input[type="text"]').forEach(function (Mini_Child) {
+                        if (Child.className === "oui") {
+                            if (Compteur[0] < Type.length || Type[Compteur - 1] === "Duree") {
+                                if (Mini_Child.getAttribute("data-score") === "SS") {
+                                    Text = "=>" + Mini_Child.value + End(Compteur[1], Type);
                                 } else {
-                                    Text += Plus(compteur, child.innerText.includes("=>")) + child.value + "\\";
+                                    Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[0], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
                                 }
+                                Compteur[0]++;
+                            } else if (Compteur[0] === Type.length) {
+                                Text += Mini_Child.value + "\\"
+                                Compteur[0] = 0;
                             }
-                            compteur++;
-                        });
-                        if (Text.length > 0 && Text[0] === "+") {
-                            cell.innerHTML = '="' + Text.slice(0, -1) + '"';
-                        } else {
-                            cell.innerHTML = Text.slice(0, -1);
                         }
-                        break;
-                    case "Perso":
-                        Text = ""
-                        cell.querySelectorAll('select').forEach(function (child) {
-                            if (child.parentElement.className === "oui") {
-                                Text += child.value + ",";
-                            }
-                        });
-                        cell.innerHTML = Text.slice(0, -1);
-                        break;
-                    case "Appartenance|Duree":
-                    case "Info|Duree":
-                    case "Lieu|Duree":
-                        Text = "";
-                        compteur = [0, 0];
-                        cell.querySelectorAll('div').forEach(function (child) {
-                            child.querySelectorAll('select, input[type="text"]').forEach(function (minichild) {
-                                if (child.className === "oui") {
-                                    if (compteur[0] === 0) {
-                                        if (minichild.getAttribute("data-score") === "SS") {
-                                            Text = Text.slice(0, -1) + "=>" + minichild.value + ",";
-                                        } else {
-                                            Text += Plus(compteur[1], child.innerText.includes("=>")) + minichild.value + ",";
-                                        }
-                                        compteur[0]++;
-                                    } else if (compteur[0] === 1) {
-                                        Text += minichild.value + "-";
-                                        compteur[0]++;
-                                    } else if (compteur[0] === 2) {
-                                        Text += minichild.value + "\\";
-                                        compteur[0] = 0;
-                                    }
-                                }
-                                compteur[1]++;
-                            });
-
-                        });
-                        if (Text.length > 0 && Text[0] === "+") {
-                            cell.innerHTML = '="' + Text.slice(0, -1) + '"';
-                        } else {
-                            cell.innerHTML = Text.slice(0, -1);
-                        }
-                        break;
-                    case "Perso|Infos":
-                        Text = "";
-                        compteur = [0, 0];
-                        cell.querySelectorAll('div').forEach(function (child) {
-                            child.querySelectorAll('select, input[type="text"]').forEach(function (minichild) {
-                                if (child.className === "oui") {
-                                    if (compteur[0] === 0) {
-                                        if (minichild.getAttribute("data-score") === "SS") {
-                                            Text = Text.slice(0, -1) + "=>" + minichild.value + ",";
-                                        } else {
-                                            Text += Plus(compteur[1], child.innerText.includes("=>")) + minichild.value + ","
-                                        }
-                                        compteur[0]++;
-                                    } else if (compteur[0] === 1) {
-                                        Text += minichild.value + "\\"
-                                        compteur[0] = 0;
-                                    }
-                                }
-                                compteur[1]++;
-                            });
-                        });
-                        if (Text.length > 0 && Text[0] === "+") {
-                            cell.innerHTML = '="' + Text.slice(0, -1) + '"';
-                        } else {
-                            cell.innerHTML = Text.slice(0, -1);
-                        }
-                        break;
-                    case "Info|Infos|Duree":
-                        Text = "";
-                        compteur = [0, 0];
-                        cell.querySelectorAll('div').forEach(function (child) {
-                            child.querySelectorAll('input[type="text"]').forEach(function (minichild) {
-                                if (child.className === "oui") {
-                                    if (compteur[0] === 0) {
-                                        if (minichild.getAttribute("data-score") === "SS") {
-                                            Text = Text.slice(0, -1) + "=>" + minichild.value + ",";
-                                        } else {
-                                            Text += Plus(compteur[1], child.innerText.includes("=>")) + minichild.value + ","
-                                        }
-                                        compteur[0]++;
-                                    } else if (compteur[0] === 1) {
-                                        Text += minichild.value + ","
-                                        compteur[0]++;
-                                    } else if (compteur[0] === 2) {
-                                        Text += minichild.value + "-"
-                                        compteur[0]++;
-                                    } else {
-                                        Text += minichild.value + "\\"
-                                        compteur[0] = 0;
-                                    }
-                                }
-                                compteur[1]++;
-                            });
-                        });
-                        if (Text.length > 0 && Text[0] === "+") {
-                            cell.innerHTML = '="' + Text.slice(0, -1) + '"';
-                        } else {
-                            cell.innerHTML = Text.slice(0, -1);
-                        }
-                        break;
+                        Compteur[1]++;
+                    });
+                    Compteur = [0, 0]
+                });
+                if (Text.length > 0 && Text[0] === "+") {
+                    Cell.innerHTML = '="' + Text.slice(0, -1) + '"';
+                } else {
+                    Cell.innerHTML = Text.slice(0, -1);
                 }
             }
         }
@@ -1146,105 +670,99 @@ async function DatasVictorySpe2(WHERE) {
     return Dico;
 }
 
-async function generalModif() {
-    let DATAS_RANGE = await DatasRange();
+async function GeneralModif() {
+    let Datas_Range = await DatasRange();
     localStorage.setItem('ModifSpe', 'true');
     localStorage.setItem('ModifSpe2', 'true');
-    let dicoReturnPast = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, DATAS_RANGE);
+    let Dico_Return_Past = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
     // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem(`Where${ANIME}`));
-    var MainDatasPast = dicoReturnPast["Main"];
-    var [PersoDatasPast, PersoDatasColumnsPast] = dicoReturnPast["Perso"];
-    var [LieuDatasPast, LieuDatasColumnsPast] = dicoReturnPast["Lieu"];
-    var [AppartenanceDatasPast, AppartenanceDatasColumnsPast] = dicoReturnPast["Appartenance"];
-    var [ChapDatasPast, ChapDatasColumnsPast] = dicoReturnPast["Chapter"];
-    
-    var divPro = document.getElementById("modification");
-    
+    var Main_Datas_Past = Dico_Return_Past["Main"];
+    var Perso_Datas_Past = Dico_Return_Past["Perso"][0];
+    var [Chap_Datas_Past, Chap_Datas_Columns_Past] = Dico_Return_Past["Chapter"];
+    var Div_Pro = document.getElementById("modification");
     var Liste = [];
-    Object.keys(DATAS_RANGE).forEach(element => {
+    Object.keys(Datas_Range).forEach(element => {
         if (!(["Chapter", "Main", "id"].includes(element))) {
-            Liste.push(dicoReturnPast[element].concat([element]));
+            Liste.push(Dico_Return_Past[element].concat([element]));
         }
     })
-    console.log("Liste", Liste);
+    // console.log("Liste", Liste);
     Liste.forEach(Datas => {
         var Text = `<div class='table-container'><table border=1 id='table'><caption>${Datas[2]} :<br></select></caption><thead><tr>`;
-        Datas[1].forEach(element => {
-            Text += `<th>${element}</th>`;
+        Datas[1].forEach(Element => {
+            Text += `<th>${Element}</th>`;
         });
-
-        compteur = [0, 0];
-        Text += `</tr></thead><tbody><tr id="${compteur[1]}">`;
-        Datas[1].forEach(element => {
-            if (compteur[0] === 0) {
+        var Compteur = [0, 0];
+        Text += `</tr></thead><tbody><tr id="${Compteur[1]}">`;
+        Datas[1].forEach(() => {
+            if (Compteur[0] === 0) {
                 Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
-            } else if (compteur[0] === 1) {
+            } else if (Compteur[0] === 1) {
                 Text += `<td><select id="numero" name="numero" onchange="ModifierPage(this, '${Datas[2]}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
                 Object.keys(Datas[0]).forEach(element => {
                     Text += `<option value="${element}">${element} - ${Datas[0][element]["Nom"]}</option>`;
                 });
                 Text += `</select></td>`;
             } else {
-                Text += `<td data-score="${MainDatasPast[Datas[1][compteur[0]]]}"></td>`;
+                Text += `<td data-score="${Main_Datas_Past[Datas[1][Compteur[0]]]}"></td>`;
             }
-            compteur = [compteur[0] + 1, compteur[1]];
+            Compteur = [Compteur[0] + 1, Compteur[1]];
         });
         Text += "</tr></tbody></table></div>";
-        divPro.innerHTML += Text;
+        Div_Pro.innerHTML += Text;
     })
     var Text = `<div class='table-container'><table border=1 id='table'><caption>Chapitre :<br></select></caption><thead><tr>`;
-    ChapDatasColumnsPast.forEach(element => {
-        Text += `<th>${element}</th>`;
+    Chap_Datas_Columns_Past.forEach(Element => {
+        Text += `<th>${Element}</th>`;
     });
-
-    NewCompteur = 0;
+    var NewCompteur = 0;
     Text += `</tr></thead><tbody><tr id="${NewCompteur}">`;
-    if (localStorage.getItem(`Where${ANIME}`) in ChapDatasPast) {
-        ChapDatasColumnsPast.forEach(element => {
+    if (localStorage.getItem(`Where${ANIME}`) in Chap_Datas_Past) {
+        Chap_Datas_Columns_Past.forEach(() => {
             if (NewCompteur === 0) {
                 Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
             } else {
-                switch (MainDatasPast[ChapDatasColumnsPast[NewCompteur]]) {
+                switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]]}"></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Perso":
                         Temp = "";
-                        if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]])) {
-                            if (Array.isArray(ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0])) {
-                                ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]][0];
+                        if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]])) {
+                            if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0])) {
+                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0];
                             } else {
-                                ToEach = ChapDatasPast[localStorage.getItem(`Where${ANIME}`)][ChapDatasColumnsPast[NewCompteur]];
+                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]];
                             }
                             ToEach.forEach(perso => {
                                 Temp += `<div class="oui"><select style="color: red;">`;
-                                Object.keys(PersoDatasPast).forEach(element => {
+                                Object.keys(Perso_Datas_Past).forEach(element => {
                                     if (element === perso) {
-                                        Temp += `<option selected value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
+                                        Temp += `<option selected value="${element}">${element} - ${Perso_Datas_Past[element]["Nom"]}</option>`;
                                     } else {
-                                        Temp += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
+                                        Temp += `<option value="${element}">${element} - ${Perso_Datas_Past[element]["Nom"]}</option>`;
                                     }
                                 });
                                 Temp += `</select></div>`;
                             })
                         }
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'>` + Temp + `<div><button onclick="Add(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
             }
             NewCompteur++;
         });
     } else {
-        ChapDatasColumnsPast.forEach(element => {
+        Chap_Datas_Columns_Past.forEach(element => {
             if (NewCompteur === 0) {
                 Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
             } else {
-                switch (MainDatasPast[ChapDatasColumnsPast[NewCompteur]]) {
+                switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="ajusterTaille(this)" type="text" value=""></input></div></td>`;
                         break;
                     case "Perso":
-                        Text += `<td data-score='${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}'><div><button onclick="Add(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${MainDatasPast[ChapDatasColumnsPast[NewCompteur]]}')">Supprimer</button></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div><button onclick="Add(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Supprimer</button></div></td>`;
                         break;
                 }
             }
@@ -1252,31 +770,5 @@ async function generalModif() {
         });
     }
     Text += "</tr></tbody></table></div>";
-    divPro.innerHTML += Text;
-    /*
-    var Text = "<div class='table-container'><table border=1 id='table'><caption>Personnages :<br></select></caption><thead><tr>";
-    PersoDatasColumnsPast.forEach(element => {
-        Text += `<th>${element}</th>`;
-    });
-    Res = Text + "</tr></thead></table></div>";
-    divPro.innerHTML += Res;
-    
-    compteur = [0, 0];
-    Text += `</tr></thead><tbody><tr id="${compteur[1]}">`;
-    PersoDatasColumnsPast.forEach(element => {
-        if (compteur[0] === 0) {
-            Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
-        } else if (compteur[0] === 1) {
-            Text += `<td><select id="numero" name="numero" onchange="ModifierPage(${compteur[1]})"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
-            Object.keys(PersoDatasPast).forEach(element => {
-                Text += `<option value="${element}">${element} - ${PersoDatasPast[element]["Nom"]}</option>`;
-            });
-            Text += `</select></td>`;
-        } else {
-            Text += `<td data-score="${MainDatasPast[PersoDatasColumnsPast[compteur[0]]]}"></td>`;
-        }
-        compteur = [compteur[0] + 1, compteur[1]];
-    });
-    Text += "</tr></tbody></table></div>";
-    divPro.innerHTML = Text;*/
+    Div_Pro.innerHTML += Text;
 }
