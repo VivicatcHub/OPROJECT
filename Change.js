@@ -233,8 +233,8 @@ async function ModifierPage(INPUT, TYPE) {
                     switch (Type[0]) {
                         case "Info":
                         case "Infom":
-                            if (Array.isArray(Data[0])) {
-                                Text_Temp += `<div class="oui"><input oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>`;
+                            if (Array.isArray(Data)) {
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>`;
                             } else {
                                 Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data}"></input>${Div}`;
                             }
