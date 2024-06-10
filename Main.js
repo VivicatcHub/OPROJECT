@@ -1,4 +1,4 @@
-var WHERE = localStorage.getItem(`Where${ANIME}`);
+var WHERE = parseInt(localStorage.getItem(`Where${ANIME}`));
 var MODIF = localStorage.getItem('Modif');
 var I = localStorage.getItem('I');
 if (I === null) {
