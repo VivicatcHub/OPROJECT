@@ -33,6 +33,7 @@ async function TraiterSheetDatas(DATA, WHERE, TYPE, SPE) {
     SPE (BOOL): true - seulement le chapitre actuel
                 false - chapitres d'avant également
     */
+    WHERE = parseInt(WHERE);
     if (TYPE === "Main") {
         return TraiterMainDatas(DATA)
     } else {
