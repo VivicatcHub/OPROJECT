@@ -136,15 +136,13 @@ async function Modification(ELEMENT) {
 }
 
 function InDatas(DATA, RANGE) {
-    if (!Array.isArray(RANGE) || !Array.isArray(DATA)) {
-        return DATA === RANGE;
-    }
     return RANGE.some(element => {
-        console.log("RANGE:", RANGE, "DATA:", DATA, Array.isArray(element), Array.isArray(DATA), element.length === DATA.length);
         // Vérifie si l'élément et DATA sont des tableaux de même longueur
-        if (Array.isArray(element) && Array.isArray(DATA) && element.length === DATA.length) {
+        if (Array.isArray(DATA) && element.length === DATA.length) {
             // Compare chaque élément du tableau
             return element.every((value, index) => value === DATA[index]);
+        } else if (element.length === DATA.length)  {
+            return element === DATA;
         }
         return false;
     });
@@ -189,7 +187,7 @@ async function ModifierPage(INPUT, TYPE) {
             if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
                 Ligne_Past[Choix][Column[Compteur]].forEach(Data => {
                     let Div = DivOrNot(Type.length, 0, true);
-                    if (!(Choix in Ligne_Act) || (Ligne_Act[Choix][Column[Compteur]] === null || !InDatas(Data, Ligne_Act[Choix][Column[Compteur]][0]))) {
+                    if (!(Choix in Ligne_Act) || (Ligne_Act[Choix][Column[Compteur]] === null || !InDatas(Data, Ligne_Act[Choix][Column[Compteur]]))) {
                         switch (Type[0]) {
                             case "Info":
                             case "Infom":
