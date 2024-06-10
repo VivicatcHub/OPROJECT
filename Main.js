@@ -48,6 +48,7 @@ async function TraiterSheetDatas(DATA, WHERE, TYPE, SPE) {
             if (WHERE === 'None') {WhereExist = 0;}
             for (let i = Temp; i < DATA.table.rows.length; i++) {
                 if ((SPE && DATA.table.rows[i].c[0].v == WHERE) || !SPE) {
+                    // console.log(DATA.table.rows[i].c[0].v);
                     if (WhereExist === 1 && DATA.table.rows[i].c[0].v > WHERE) {
                         return [NewData, Datacolumns];
                     } else if (NewData[DATA.table.rows[i].c[WhereExist].v] !== undefined) {
