@@ -680,6 +680,31 @@ async function DatasVictorySpe2(WHERE) {
     return Dico;
 }
 
+function copyTable(TAB) {
+    // Sélectionner le tableau
+    var table = TAB.parentElement.children[0];
+    var rows = table.rows;
+    var textToCopy = '';
+
+    // Boucle pour récupérer les lignes sauf la première et la dernière
+    for (var i = 1; i < rows.length - 1; i++) {
+        var cells = rows[i].cells;
+        var rowText = [];
+        for (var j = 0; j < cells.length; j++) {
+            rowText.push(cells[j].innerText);
+        }
+        textToCopy += rowText.join('\t') + '\n';
+    }
+
+    // Créer un élément textarea pour copier le texte
+    var textarea = document.createElement('textarea');
+    textarea.value = textToCopy;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+}
+
 async function GeneralModif() {
     let Datas_Range = await DatasRange();
     localStorage.setItem('ModifSpe', 'true');
@@ -718,7 +743,7 @@ async function GeneralModif() {
             }
             Compteur = [Compteur[0] + 1, Compteur[1]];
         });
-        Text += "</tr></tbody></table></div>";
+        Text += "</tr></tbody></table><button onclick='copyTable(this)'>Copier le tableau</button></div>";
         Div_Pro.innerHTML += Text;
     })
     var Text = `<div class='table-container'><table border=1 id='table'><caption>Chapitre :<br></select></caption><thead><tr>`;
@@ -779,6 +804,6 @@ async function GeneralModif() {
             NewCompteur++;
         });
     }
-    Text += "</tr></tbody></table></div>";
+    Text += "</tr></tbody></table><button onclick='copyTable(this)'>Copier le tableau</button></div>";
     Div_Pro.innerHTML += Text;
 }

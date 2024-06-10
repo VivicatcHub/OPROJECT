@@ -276,7 +276,6 @@ async function DatasRange() {
 }
 
 function WhereOrNot(TYPE, WHERE) {
-    console.log(TYPE, WHERE)
     switch (TYPE) {
         case "Main":
         case "Chapter":

@@ -188,7 +188,7 @@ p {
 
 /* Style pour le tableau */
 .table-container {
-    display: flex;
+    display: block;
     margin-top: 20px;
     border: 1px solid #ccc;
     overflow-x: auto;
