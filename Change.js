@@ -13,7 +13,7 @@ function AddButton(DATA, CASE) {
 
 async function Add(ELEMENT, TYPE) {
     let Datas_Range = await DatasRange();
-    let Dico_Return_Past = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
+    let Dico_Return_Past = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
     var Child = ELEMENT.parentElement.parentElement;
     ELEMENT.parentElement.remove();
     let New_Element = document.createElement('div');
@@ -87,7 +87,7 @@ function AjusterTaille(INPUT) {
 
 async function Modification(ELEMENT) {
     let Datas_Range = await DatasRange();
-    let Dico_Return_Past = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
+    let Dico_Return_Past = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
     // console.log(Element, Data);
     var Parent = ELEMENT.parentElement;
     let Liste = Array.from(ELEMENT.parentElement.children);
@@ -171,8 +171,8 @@ async function ModifierPage(INPUT, TYPE) {
     var Choix = INPUT.value;
     var Ligne = INPUT.parentElement.parentElement;
     let Datas_Range = await DatasRange();
-    let Dico_Return_Past = await DatasVictorySpe2(localStorage.getItem(`Where${ANIME}`));
-    let Dico_Return = await DatasVictorySpe(localStorage.getItem(`Where${ANIME}`));
+    let Dico_Return_Past = await DatasVictorySpe2(parseInt(localStorage.getItem(`Where${ANIME}`)));
+    let Dico_Return = await DatasVictorySpe(parseInt(localStorage.getItem(`Where${ANIME}`)));
     var Compteur = 0;
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
@@ -340,14 +340,14 @@ async function ModifierPage(INPUT, TYPE) {
     });
     var table = Ligne.parentElement.parentElement.getElementsByTagName('tbody')[0];
     var newRow = table.insertRow();
-    Dico_Return = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
+    Dico_Return = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
     Ligne_Past = Dico_Return[TYPE][0];
     Compteur = [0, table.rows.length];
     newRow.id = `${Compteur[1]}`
     Text = ``;
     Column.forEach(() => {
         if (Compteur[0] === 0) {
-            Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
+            Text += `<td>${parseInt(localStorage.getItem(`Where${ANIME}`))}</td>`;
         } else if (Compteur[0] === 1) {
             Text += `<td><select id="numero" name="numero" onchange="ModifierPage(this, '${TYPE}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
             Object.keys(Ligne_Past).forEach(element => {
@@ -683,8 +683,8 @@ async function GeneralModif() {
     let Datas_Range = await DatasRange();
     localStorage.setItem('ModifSpe', 'true');
     localStorage.setItem('ModifSpe2', 'true');
-    let Dico_Return_Past = await DatasVictory(localStorage.getItem(`Where${ANIME}`), false, Datas_Range);
-    // console.log("dicoReturnPast", dicoReturnPast, localStorage.getItem(`Where${ANIME}`));
+    let Dico_Return_Past = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
+    // console.log("dicoReturnPast", dicoReturnPast, parseInt(localStorage.getItem(`Where${ANIME}`)));
     var Main_Datas_Past = Dico_Return_Past["Main"];
     var Perso_Datas_Past = Dico_Return_Past["Perso"][0];
     var [Chap_Datas_Past, Chap_Datas_Columns_Past] = Dico_Return_Past["Chapter"];
@@ -705,7 +705,7 @@ async function GeneralModif() {
         Text += `</tr></thead><tbody><tr id="${Compteur[1]}">`;
         Datas[1].forEach(() => {
             if (Compteur[0] === 0) {
-                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
+                Text += `<td>${parseInt(localStorage.getItem(`Where${ANIME}`))}</td>`;
             } else if (Compteur[0] === 1) {
                 Text += `<td><select id="numero" name="numero" onchange="ModifierPage(this, '${Datas[2]}')"><option style="text-align: center;" value="" selected>NUMERO</option><option value="new">Nouveau</option>`;
                 Object.keys(Datas[0]).forEach(element => {
@@ -726,22 +726,22 @@ async function GeneralModif() {
     });
     var NewCompteur = 0;
     Text += `</tr></thead><tbody><tr id="${NewCompteur}">`;
-    if (localStorage.getItem(`Where${ANIME}`) in Chap_Datas_Past) {
+    if (parseInt(localStorage.getItem(`Where${ANIME}`)) in Chap_Datas_Past) {
         Chap_Datas_Columns_Past.forEach(() => {
             if (NewCompteur === 0) {
-                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
+                Text += `<td>${parseInt(localStorage.getItem(`Where${ANIME}`))}</td>`;
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Perso":
                         Temp = "";
-                        if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]])) {
-                            if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0])) {
-                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0];
+                        if (Array.isArray(Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]])) {
+                            if (Array.isArray(Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]][0])) {
+                                ToEach = Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]][0];
                             } else {
-                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]];
+                                ToEach = Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]];
                             }
                             ToEach.forEach(perso => {
                                 Temp += `<div class="oui"><select style="color: red;">`;
@@ -764,7 +764,7 @@ async function GeneralModif() {
     } else {
         Chap_Datas_Columns_Past.forEach(element => {
             if (NewCompteur === 0) {
-                Text += `<td>${localStorage.getItem(`Where${ANIME}`)}</td>`;
+                Text += `<td>${parseInt(localStorage.getItem(`Where${ANIME}`))}</td>`;
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
