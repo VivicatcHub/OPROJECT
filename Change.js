@@ -734,15 +734,15 @@ async function GeneralModif() {
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Perso":
                         Temp = "";
-                        if (Array.isArray(Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]])) {
-                            if (Array.isArray(Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]][0])) {
-                                ToEach = Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]][0];
+                        if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]])) {
+                            if (Array.isArray(Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0])) {
+                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]][0];
                             } else {
-                                ToEach = Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`))][Chap_Datas_Columns_Past[NewCompteur]];
+                                ToEach = Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]];
                             }
                             ToEach.forEach(perso => {
                                 Temp += `<div class="oui"><select style="color: red;">`;
