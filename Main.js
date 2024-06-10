@@ -33,10 +33,12 @@ async function TraiterSheetDatas(DATA, WHERE, TYPE, SPE) {
     SPE (BOOL): true - seulement le chapitre actuel
                 false - chapitres d'avant également
     */
-    WHERE = parseInt(WHERE);
-    if (TYPE === "Main") {
-        return TraiterMainDatas(DATA)
+   if (TYPE === "Main") {
+       return TraiterMainDatas(DATA)
     } else {
+        if (WHERE !== 'None') {
+            WHERE = parseInt(WHERE);
+        }
         try {
             var Temp = 0;
             Datacolumns = DATA.table.cols.map(Element => Element.label);
@@ -49,7 +51,7 @@ async function TraiterSheetDatas(DATA, WHERE, TYPE, SPE) {
             if (WHERE === 'None') {WhereExist = 0;}
             for (let i = Temp; i < DATA.table.rows.length; i++) {
                 if ((SPE && DATA.table.rows[i].c[0].v == WHERE) || !SPE) {
-                    // console.log(DATA.table.rows[i].c[0].v);
+                    // console.log(WHERE, DATA.table.rows[i].c[0].v, DATA.table.rows[i].c[1].v);
                     if (WhereExist === 1 && DATA.table.rows[i].c[0].v > WHERE) {
                         return [NewData, Datacolumns];
                     } else if (NewData[DATA.table.rows[i].c[WhereExist].v] !== undefined) {
@@ -274,6 +276,7 @@ async function DatasRange() {
 }
 
 function WhereOrNot(TYPE, WHERE) {
+    console.log(TYPE, WHERE)
     switch (TYPE) {
         case "Main":
         case "Chapter":
