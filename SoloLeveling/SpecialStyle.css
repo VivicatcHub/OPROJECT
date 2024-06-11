@@ -1,3 +1,7 @@
+:root {
+    --color-spe: #440a9d;
+}
+
 @font-face {
     font-family: "Special_Font";
     src: url("SoloLevelDemo.otf") format("TrueType");

@@ -1,3 +1,7 @@
+:root {
+    --color-spe: #ed7c03;
+}
+
 @font-face {
     font-family: "Special_Font";
     src: url("njnaruto.ttf") format("TrueType");

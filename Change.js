@@ -136,14 +136,17 @@ async function Modification(ELEMENT) {
 }
 
 function InDatas(DATA, RANGE) {
-    return RANGE.some(element => {
+    if (Array.isArray(RANGE[0][0])) {
+        RANGE = RANGE[0];
+    }
+    return RANGE.some(Element => {
         // Vérifie si l'élément et DATA sont des tableaux de même longueur
-        if (Array.isArray(DATA) && element.length === DATA.length) {
+        if (Array.isArray(DATA) && Element.length === DATA.length) {
             // Compare chaque élément du tableau
-            return element.every((value, index) => value === DATA[index]);
-        } else if (element.length === DATA.length)  {
-            return element === DATA;
-        }
+            return Element.every((value) => value === DATA);
+        } else if (Element[0].length === DATA.length)  {
+            return Element[0] === DATA;
+        } 
         return false;
     });
 }
@@ -168,6 +171,26 @@ function DivOrNot(BOOL, I, BUTTON) {
     }
 }
 
+function Image(DATAS, ID) {
+    if (ID !== 'new' && "Image" in DATAS[ID]) {
+        return DATAS[ID]["Image"][0][0];
+    } else {
+        return "";
+    }
+}
+
+function GetIndexWithMaxValue(TABLE) {
+    let Max_Index = null;
+    let Max_Value = -Infinity; // Valeur initiale très basse
+    for (const Index in TABLE) {
+        if (parseInt(TABLE[Index].Ordre[0]) > Max_Value) {
+            Max_Value = parseInt(TABLE[Index].Ordre[0]);
+            Max_Index = Index;
+        }
+    }
+    return Max_Index;
+}
+
 async function ModifierPage(INPUT, TYPE) {
     var Choix = INPUT.value;
     var Ligne = INPUT.parentElement.parentElement;
@@ -180,7 +203,7 @@ async function ModifierPage(INPUT, TYPE) {
     Array.from(Ligne.children).forEach(function (Child) {
         // console.log("compteur:", compteur, "choix:", choix, "Ligne_Past:", Ligne_Past, "Ligne_Past[choix][Column[compteur]]:", Ligne_Past[choix][Column[compteur]], "Ligne_Act:", Ligne_Act, "Ligne_Act[choix][Column[compteur]]:", Ligne_Act[choix][Column[compteur]]);
         if (Compteur === 1) {
-            Child.innerHTML = Choix;
+            Child.innerHTML = Choix + `<img src="${Image(Ligne_Past, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
             let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
@@ -191,8 +214,8 @@ async function ModifierPage(INPUT, TYPE) {
                         switch (Type[0]) {
                             case "Info":
                             case "Infom":
-                                    Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
-                                    Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
+                                Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
+                                Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
                                 break;
                             default:
                                 try {
@@ -233,10 +256,11 @@ async function ModifierPage(INPUT, TYPE) {
                     switch (Type[0]) {
                         case "Info":
                         case "Infom":
-                            if (Array.isArray(Data)) {
-                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>`;
+                            console.log(Data, Array.isArray(Data))
+                            if (Array.isArray(Data[0])) {
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0][0]}"></input>`;
                             } else {
-                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data}"></input>${Div}`;
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -250,7 +274,7 @@ async function ModifierPage(INPUT, TYPE) {
                                     var Temp = `<div class="oui"><select style="color: red;">`;
                                 }
                                 Object.keys(Dico[0]).forEach(Element => {
-                                    if (Data[0][0] == Element) {
+                                    if (Data[0] == Element) {
                                         Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                                     } else {
                                         Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -680,14 +704,19 @@ async function DatasVictorySpe2(WHERE) {
     return Dico;
 }
 
-function copyTable(TAB) {
+function copyTable(TAB, SPE) {
     // Sélectionner le tableau
     var table = TAB.parentElement.children[0];
     var rows = table.rows;
     var textToCopy = '';
 
+    let Temp = 1;
+    if (SPE) {
+        Temp = 0;
+    }
+
     // Boucle pour récupérer les lignes sauf la première et la dernière
-    for (var i = 1; i < rows.length - 1; i++) {
+    for (var i = 1; i < rows.length - Temp; i++) {
         var cells = rows[i].cells;
         var rowText = [];
         for (var j = 0; j < cells.length; j++) {
@@ -743,7 +772,7 @@ async function GeneralModif() {
             }
             Compteur = [Compteur[0] + 1, Compteur[1]];
         });
-        Text += "</tr></tbody></table><button onclick='copyTable(this)'>Copier le tableau</button></div>";
+        Text += "</tr></tbody></table><button onclick='copyTable(this, false)'>Copier le tableau</button></div>";
         Div_Pro.innerHTML += Text;
     })
     var Text = `<div class='table-container'><table border=1 id='table'><caption>Chapitre :<br></select></caption><thead><tr>`;
@@ -788,13 +817,17 @@ async function GeneralModif() {
             NewCompteur++;
         });
     } else {
-        Chap_Datas_Columns_Past.forEach(element => {
+        Chap_Datas_Columns_Past.forEach(() => {
             if (NewCompteur === 0) {
                 Text += `<td>${parseInt(localStorage.getItem(`Where${ANIME}`))}</td>`;
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
-                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value=""></input></div></td>`;
+                        var Value = "";
+                        if (Chap_Datas_Columns_Past[NewCompteur] === "Ordre") {
+                            Value = parseInt(Chap_Datas_Past[GetIndexWithMaxValue(Chap_Datas_Past)][Chap_Datas_Columns_Past[NewCompteur]]) + 1;
+                        }
+                        Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Value}"></input></div></td>`;
                         break;
                     case "Perso":
                         Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div><button onclick="Add(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Ajouter</button><button onclick="Supp(this, '${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}')">Supprimer</button></div></td>`;
@@ -804,6 +837,6 @@ async function GeneralModif() {
             NewCompteur++;
         });
     }
-    Text += "</tr></tbody></table><button onclick='copyTable(this)'>Copier le tableau</button></div>";
+    Text += "</tr></tbody></table><button onclick='copyTable(this, true)'>Copier le tableau</button></div>";
     Div_Pro.innerHTML += Text;
 }
