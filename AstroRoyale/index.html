@@ -12,7 +12,7 @@
     <meta name="google-adsense-account" content="ca-pub-1732017259884755">
     <link rel='stylesheet'
         href='https://cdn-uicons.flaticon.com/2.4.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
-        
+
 
     <title>OPROJECT - Astro Royale</title>
 </head>
@@ -23,9 +23,7 @@
     </style>
     <header>
         <nav class="navbar">
-            <a href="index.html"><img
-                    src="Logo.png"
-                    alt="logo" class="logo"></a>
+            <a href="index.html"><img src="Logo.png" alt="logo" class="logo"></a>
             <div class="nav-links">
                 <ul>
                     <li>
@@ -54,9 +52,8 @@
         </div>
         <div class="Perso" id="Perso">
             <h1 id="Perso_Title">PERSONNAGES<button onclick="Click('Perso_Data')" id="toggleViewButtonPerso_Data"><i
-                        class="fi fi-rr-apps"></i></button><button
-                        onclick="toggleChapterData('Perso_Data')" id="toggleViewButtonSpePerso_Data"><i
-                            class="fi fi-rr-angle-double-small-down"></i></button></h1>
+                        class="fi fi-rr-apps"></i></button><button onclick="toggleChapterData('Perso_Data')"
+                    id="toggleViewButtonSpePerso_Data"><i class="fi fi-rr-angle-double-small-down"></i></button></h1>
             <p id="Perso_Data"></p>
         </div>
         <div class="Discord" id="Discord">
@@ -72,7 +69,7 @@
     <script src="../Chapitre.js"></script>
     <script>
         General();
-        
+
         function Click(CONTAINER) {
             const chapterContainer = document.querySelector(`#${CONTAINER}`);
             const toggleViewButton = document.getElementById(`toggleViewButton${CONTAINER}`);
