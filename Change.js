@@ -143,7 +143,7 @@ function InDatas(DATA, RANGE) {
         // Vérifie si l'élément et DATA sont des tableaux de même longueur
         if (Array.isArray(DATA) && Element.length === DATA.length) {
             // Compare chaque élément du tableau
-            return Element.every((value) => value === DATA);
+            return Element.every((value, index) => value === DATA[index]);
         } else if (Element[0].length === DATA.length)  {
             return Element[0] === DATA;
         } 
@@ -172,7 +172,7 @@ function DivOrNot(BOOL, I, BUTTON) {
 }
 
 function Image(DATAS, ID) {
-    if (ID !== 'new' && "Image" in DATAS[ID]) {
+    if (ID !== 'new' && "Image" in DATAS[ID] && DATAS[ID]["Image"] !== null) {
         return DATAS[ID]["Image"][0][0];
     } else {
         return "";
@@ -201,9 +201,8 @@ async function ModifierPage(INPUT, TYPE) {
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
-        // console.log("compteur:", compteur, "choix:", choix, "Ligne_Past:", Ligne_Past, "Ligne_Past[choix][Column[compteur]]:", Ligne_Past[choix][Column[compteur]], "Ligne_Act:", Ligne_Act, "Ligne_Act[choix][Column[compteur]]:", Ligne_Act[choix][Column[compteur]]);
         if (Compteur === 1) {
-            Child.innerHTML = Choix + `<img src="${Image(Ligne_Past, Choix)}">`;
+            Child.innerHTML = Choix + `<img src="${Image({ ...Ligne_Past, ...Ligne_Act }, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
             let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
@@ -256,11 +255,12 @@ async function ModifierPage(INPUT, TYPE) {
                     switch (Type[0]) {
                         case "Info":
                         case "Infom":
-                            console.log(Data, Array.isArray(Data))
                             if (Array.isArray(Data[0])) {
                                 Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0][0]}"></input>`;
-                            } else {
+                            } else if (Array.isArray(Data)) {
                                 Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0]}"></input>${Div}`;
+                            } else {
+                                Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data}"></input>${Div}`;
                             }
                             break;
                         default:
@@ -274,7 +274,9 @@ async function ModifierPage(INPUT, TYPE) {
                                     var Temp = `<div class="oui"><select style="color: red;">`;
                                 }
                                 Object.keys(Dico[0]).forEach(Element => {
-                                    if (Data[0] == Element) {
+                                    if (Data[0][0] == Element && Array.isArray(Data[0])) {
+                                        Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                    } else if (Data[0] == Element && Array.isArray(Data)) {
                                         Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                                     } else {
                                         Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -388,8 +390,8 @@ async function ModifierPage(INPUT, TYPE) {
 }
 
 function Plus(NUM, BOOL, INT, COMPT) {
-    if (NUM === 0 && BOOL !== true && COMPT !== 7 && INT !== 0) {
-        return "+";
+    if (NUM === 0 && BOOL !== true && COMPT !== document.querySelectorAll('table').length - 1 && INT !== 0) {
+        return "\\+";
     } else {
         return "";
     }
@@ -408,7 +410,7 @@ function End(NUM, DATA) {
 function Transfo() {
     Xompteur = 0;
     document.querySelectorAll('table').forEach(table => {
-        if (Xompteur === 7) {
+        if (Xompteur === document.querySelectorAll('table').length - 1) {
             Vi = 0;
             Vj = 1;
         } else {
@@ -438,7 +440,7 @@ function Transfo() {
                                     Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[2], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
                                     }
                                 Compteur[0]++;
-                            } else if (Compteur[0] === Type.length) {
+                            } else if (Compteur[0] === Type.length || (Type[Compteur - 1] !== "Duree" && Compteur[0] === Type.length - 1)) {
                                 Text += Mini_Child.value + "\\"
                                 Compteur[0] = 0;
                             }
@@ -449,8 +451,9 @@ function Transfo() {
                     Compteur[1] = 0;
                     Compteur[2]++;
                 });
-                if (Text.length > 0 && Text[0] === "+") {
-                    Cell.innerHTML = '="' + Text.slice(0, -1) + '"';
+                Text = Text.replace(/\\\\/g, "\\");
+                if (Text.length > 0 && Text[1] === "+") {
+                    Cell.innerHTML = '="' + Text.slice(1, -1) + '"';
                 } else {
                     Cell.innerHTML = Text.slice(0, -1);
                 }

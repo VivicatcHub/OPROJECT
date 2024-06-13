@@ -1,0 +1,10 @@
+:root {
+    --color-spe: black;
+}
+
+@font-face {
+    font-family: "Special_Font";
+    src: url("SoloLevelDemo.otf") format("TrueType");
+    font-weight: normal;
+    font-style: normal;
+}

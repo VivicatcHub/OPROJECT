@@ -298,7 +298,6 @@ async function DatasVictory(WHERE, SPE, DATAS) {
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS[Element], false), await WhereOrNot(Element, WHERE), Element);
             });
             await Promise.all(promises); // Attendre que toutes les promesses se terminent
-            console.log(Dico);
 
             if (SPE === false) {
                 LISTE.forEach(function (Element) {
