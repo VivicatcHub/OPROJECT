@@ -481,7 +481,7 @@ async function General() {
             for (let i = 0; i <= PersoDatas.length; i++) {
                 if (PersoDatas[i] !== undefined) {
                     if (PersoDatas[i]["Image"] !== null) {
-                        Text += `<a href="index.html?chap=${WHERE}&char=${i}"><div class="chapter-line"><div class="chapter-number"><img class="pitite" src="${PersoDatas[i]["Image"][0]}"></div><div class="chapter-title">${PersoDatas[i]["Nom"]}</div></div></a>`;
+                        Text += `<a href="index.html?chap=${WHERE}&char=${i}"><div class="chapter-line"><div class="chapter-number"><img class="pitite" src="${PersoDatas[i]["Image"][0][0]}"></div><div class="chapter-title">${PersoDatas[i]["Nom"]}</div></div></a>`;
                     } else {
                         Text += `<a href="index.html?chap=${WHERE}&char=${i}"><div class="chapter-line"><div class="chapter-number"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg"></div><div class="chapter-title">${PersoDatas[i]["Nom"]}</div></div></a>`;
                     }
@@ -494,12 +494,13 @@ async function General() {
 
             // CHAP
         } else if (CHAP !== null && CHAR === null && LIEU === null) {
+            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             let Text = "Personnages du chapitre<br><div class='vu'>";
             if (ChapDatas[CHAP] !== null && ChapDatas[CHAP]["Mentionnés"] !== null && ChapDatas[CHAP]["Mentionnés"][0] !== null) {
                 for (let k = 0; k <= ChapDatas[CHAP]["Personnages"][0].length; k++) {
                     if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]] !== undefined && ChapDatas[CHAP]["Personnages"][0][k] !== undefined) {
                         if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"] !== null) {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"][0][0]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                         } else {
                             Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                         }
@@ -513,7 +514,7 @@ async function General() {
                 for (let k = 0; k <= ChapDatas[CHAP]["Mentionnés"][0].length; k++) {
                     if (ChapDatas[CHAP]["Mentionnés"][0][k] !== undefined) {
                         if (PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"] !== null) {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         } else {
                             Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         }
@@ -526,54 +527,9 @@ async function General() {
 
             document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
             document.getElementById("Data").innerHTML = Text;
-
-            var curseur = $("#poignee");
-            curseur.text(CHAP);
-            $("#barre").slider(
-                {
-                    min: 0, max: WHERE,
-                    slide: function (event, ui) {
-                        curseur.text(ui.value);
-                        CHAP = ui.value;
-                        try {
-                            let Text = "Personnages du chapitre<br><div class='vu'>";
-                            for (let k = 0; k <= ChapDatas[CHAP]["Personnages"][0].length; k++) {
-                                if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]] !== undefined && ChapDatas[CHAP]["Personnages"][0][k] !== undefined) {
-                                    if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"] !== null) {
-                                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
-                                    } else {
-                                        Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
-                                    }
-                                }
-                            }
-                            Text += "</div>Personnages mentionnés<br><div class='mentio'>";
-                            if (ChapDatas[CHAP]["Mentionnés"] !== null && ChapDatas[CHAP]["Mentionnés"][0] !== null) {
-                                for (let k = 0; k <= ChapDatas[CHAP]["Mentionnés"][0].length; k++) {
-                                    if (ChapDatas[CHAP]["Mentionnés"][0][k] !== undefined) {
-                                        if (PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"] !== null) {
-                                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
-                                        } else {
-                                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
-                                        }
-                                    }
-                                }
-                            } else {
-                                Text += "<p>Aucun</p>"
-                            }
-                            Text += "</div>"
-
-                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
-                            document.getElementById("Data").innerHTML = Text;
-                        } catch (error) {
-                            console.log(error);
-                            document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
-                            document.getElementById("Data").innerHTML = "Ce chapitre n'a pas encore été documenté";
-                        }
-                    }
-                }
-            )
             // CHAR
         } else if (CHAP === null && CHAR !== null && LIEU === null) {
+            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
             var text = [];
             for (let i = 1; i < PersoDatasColumns.length; i++) {
@@ -587,13 +543,14 @@ async function General() {
 
             // CHAR & CHAP
         } else if (CHAP !== null && CHAR !== null && LIEU === null) {
+            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
             var text = [];
             for (let i = 1; i < PersoDatasColumns.length; i++) {
                 if (PersoDatasColumns[i] === "Numéro" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
                     continue;
                 } else if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
+                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]][0][0] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
                 } else {
                     result = await Afficher(PersoDatas[CHAR], PersoDatasColumns[i], MainDatas);
                     if (result !== "") {
@@ -602,9 +559,8 @@ async function General() {
                 }
             }
             document.getElementById("Data").innerHTML = text.join("<br><br>");
-
-            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(CHAP) - 1}&char=${CHAR}">-<br>${parseInt(CHAP) - 1}</a><a href="index.html?chap=${parseInt(CHAP) + 1}&char=${CHAR}">+<br>${parseInt(CHAP) + 1}</a>`;
         } else if (CHAP !== null && CHAR === null && LIEU !== null) {
+            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             document.getElementById("Character_Name").innerHTML = LieuDatas[LIEU]["Nom"];
             var text = [];
             for (let i = 1; i < LieuDatasColumns.length; i++) {

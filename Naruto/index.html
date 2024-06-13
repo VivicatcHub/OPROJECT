@@ -13,10 +13,6 @@
     <link rel='stylesheet'
         href='https://cdn-uicons.flaticon.com/2.4.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
 
-    <link rel="stylesheet" href="jquery/les-styles.css">
-    <script src="jquery/jquery-1.12.4.js"></script>
-    <script src="jquery/jquery-ui.js"></script>
-
     <title>OPROJECT - Naruto</title>
 </head>
 
@@ -40,7 +36,7 @@
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container" id="container">
         <div class="Chapter" id="Chapter">
             <h1 id="Chapter_Title">TOUS LES CHAPITRES<button onclick="Click('Chapter_Data')"
                     id="toggleViewButtonChapter_Data"><i class="fi fi-rr-apps"></i></button><button
@@ -72,7 +68,6 @@
     <script src="../Chapitre.js"></script>
     <script>
         General();
-
 
         function Click(CONTAINER) {
             const chapterContainer = document.querySelector(`#${CONTAINER}`);

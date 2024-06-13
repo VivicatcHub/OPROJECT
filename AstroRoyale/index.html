@@ -10,10 +10,9 @@
     <link rel="shortcut icon" type="image/png" href="Logo.png" />
     <script src="https://kit.fontawesome.com/85ca233acb.js" crossorigin="anonymous"></script>
     <meta name="google-adsense-account" content="ca-pub-1732017259884755">
-
-    <link rel="stylesheet" href="jquery/les-styles.css">
-    <script src="jquery/jquery-1.12.4.js"></script>
-    <script src="jquery/jquery-ui.js"></script>
+    <link rel='stylesheet'
+        href='https://cdn-uicons.flaticon.com/2.4.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+        
 
     <title>OPROJECT - Astro Royale</title>
 </head>
@@ -41,19 +40,53 @@
         </nav>
     </header>
 
-    <h1 id="Character_Name"></h1>
-    <p id="Data"></p>
-    <div id="naviguer">
-        <div id="barre">
-            <div id="poignee" class="ui-slider-handle"></div><br />
+    <div class="container" id="container">
+        <div class="Chapter" id="Chapter">
+            <h1 id="Chapter_Title">TOUS LES CHAPITRES<button onclick="Click('Chapter_Data')"
+                    id="toggleViewButtonChapter_Data"><i class="fi fi-rr-apps"></i></button><button
+                    onclick="toggleChapterData('Chapter_Data')" id="toggleViewButtonSpeChapter_Data"><i
+                        class="fi fi-rr-angle-double-small-down"></i></button></h1>
+            <p id="Chapter_Data"></p>
+        </div>
+        <div class="New" id="New">
+            <h1 id="New_Title"></h1>
+            <p id="New_Data"></p>
+        </div>
+        <div class="Perso" id="Perso">
+            <h1 id="Perso_Title">PERSONNAGES<button onclick="Click('Perso_Data')" id="toggleViewButtonPerso_Data"><i
+                        class="fi fi-rr-apps"></i></button><button
+                        onclick="toggleChapterData('Perso_Data')" id="toggleViewButtonSpePerso_Data"><i
+                            class="fi fi-rr-angle-double-small-down"></i></button></h1>
+            <p id="Perso_Data"></p>
+        </div>
+        <div class="Discord" id="Discord">
+            <h1 id="Discord_Title"></h1>
+            <p id="Discord_Data"></p>
         </div>
     </div>
+    <h1 id="Character_Name"></h1>
+    <p id="Data"></p>
 
     <script src="Data.js"></script>
     <script src="../Main.js"></script>
     <script src="../Chapitre.js"></script>
     <script>
         General();
+        
+        function Click(CONTAINER) {
+            const chapterContainer = document.querySelector(`#${CONTAINER}`);
+            const toggleViewButton = document.getElementById(`toggleViewButton${CONTAINER}`);
+            chapterContainer.classList.toggle('cubes');
+            chapterContainer.classList.toggle('cubes-container');
+            toggleViewButton.innerHTML = chapterContainer.classList.contains('cubes') ? '<i class="fi fi-rr-apps-sort"></i>' : '<i class="fi fi-rr-apps"></i>';
+        }
+
+        function toggleChapterData(CONTAINER) {
+            const chapterData = document.getElementById(CONTAINER);
+            const toggleViewButton = document.getElementById(`toggleViewButtonSpe${CONTAINER}`);
+            chapterData.classList.toggle('show-data');
+            toggleViewButton.innerHTML = chapterData.classList.contains('show-data') ? '<i class="fi fi-rr-angle-double-small-up"></i>' : '<i class="fi fi-rr-angle-double-small-down"></i>';
+        }
     </script>
 </body>
 

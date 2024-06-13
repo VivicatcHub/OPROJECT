@@ -443,7 +443,7 @@ table img {
 }
 
 #Chapter_Data {
-    display: block;
+    display: grid;
     /* Masque initialement les données */
 }
 

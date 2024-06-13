@@ -172,6 +172,7 @@ function DivOrNot(BOOL, I, BUTTON) {
 }
 
 function Image(DATAS, ID) {
+    // console.log(ID, DATAS[ID], DATAS[ID]["Image"])
     if (ID !== 'new' && "Image" in DATAS[ID] && DATAS[ID]["Image"] !== null) {
         return DATAS[ID]["Image"][0][0];
     } else {
@@ -202,7 +203,7 @@ async function ModifierPage(INPUT, TYPE) {
     let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
         if (Compteur === 1) {
-            Child.innerHTML = Choix + `<img src="${Image({ ...Ligne_Past, ...Ligne_Act }, Choix)}">`;
+            Child.innerHTML = Choix + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
             let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
