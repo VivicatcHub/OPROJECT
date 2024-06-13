@@ -118,7 +118,7 @@ async function Modification(ELEMENT) {
                     let Dico = Dico_Return_Past[D];
                     let Temp = `=><select data-score="SS" style="color: red;">`;
                     Object.keys(Dico[0]).forEach(Element => {
-                        if (Element ===  Liste[Compteur].value) {
+                        if (Element === Liste[Compteur].value) {
                             Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                         } else {
                             Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -144,9 +144,9 @@ function InDatas(DATA, RANGE) {
         if (Array.isArray(DATA) && Element.length === DATA.length) {
             // Compare chaque élément du tableau
             return Element.every((value, index) => value === DATA[index]);
-        } else if (Element[0].length === DATA.length)  {
+        } else if (Element[0].length === DATA.length) {
             return Element[0] === DATA;
-        } 
+        }
         return false;
     });
 }
@@ -164,7 +164,7 @@ function FirstValueOrOnlyOne(DATA, BOOL) {
 function DivOrNot(BOOL, I, BUTTON) {
     if (BOOL === I + 1 && BUTTON) {
         return "<button onclick='Modification(this)'>Modif</button></div>";
-    } else if (BOOL === I + 1)  {
+    } else if (BOOL === I + 1) {
         return "</div>";
     } else {
         return "";
@@ -219,7 +219,7 @@ async function ModifierPage(INPUT, TYPE) {
                             default:
                                 try {
                                     let Dico = Dico_Return[Type[0]].map((item, index) => {
-                                        return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                        return { ...item, ...(Dico_Return_Past[Type[0]][index] || {}) };
                                     });
                                     let Temp = `<div><select>`;
                                     Object.keys(Dico[0]).forEach(Element => {
@@ -266,7 +266,7 @@ async function ModifierPage(INPUT, TYPE) {
                         default:
                             try {
                                 let Dico = Dico_Return[Type[0]].map((item, index) => {
-                                    return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                    return { ...item, ...(Dico_Return_Past[Type[0]][index] || {}) };
                                 });
                                 if (Array.isArray(Data[0])) {
                                     var Temp = `<div class="oui"><select>`;
@@ -323,7 +323,7 @@ async function ModifierPage(INPUT, TYPE) {
                             try {
                                 if (Array.isArray(Data[1])) {
                                     let Dico = Dico_Return[Type[0]].map((item, index) => {
-                                        return {...item, ...(Dico_Return_Past[Type[0]][index] || {})};
+                                        return { ...item, ...(Dico_Return_Past[Type[0]][index] || {}) };
                                     });
                                     let Temp = `=><select data-score="SS">`;
                                     Object.keys(Dico[0]).forEach(Element => {
@@ -400,7 +400,7 @@ function Plus(NUM, BOOL, INT, COMPT) {
 function End(NUM, DATA) {
     if (DATA[NUM] === "Duree") {
         return "-";
-    } else if(DATA.length > NUM) {
+    } else if (DATA.length > NUM) {
         return ",";
     } else {
         return "";
@@ -435,10 +435,10 @@ function Transfo() {
                             if (Compteur[0] < Type.length || Type[Compteur - 1] === "Duree" || Mini_Child.getAttribute("data-score") === "SS") {
                                 if (Mini_Child.getAttribute("data-score") === "SS") {
                                     Compteur[1] = 0;
-                                    Text = Text.slice(0, -1) +  "=>" + Mini_Child.value + End(Compteur[1], Type);
+                                    Text = Text.slice(0, -1) + "=>" + Mini_Child.value + End(Compteur[1], Type);
                                 } else {
                                     Text += Plus(Compteur[1], Child.innerText.includes("=>"), Compteur[2], Xompteur) + Mini_Child.value + End(Compteur[1], Type);
-                                    }
+                                }
                                 Compteur[0]++;
                             } else if (Compteur[0] === Type.length || (Type[Compteur - 1] !== "Duree" && Compteur[0] === Type.length - 1)) {
                                 Text += Mini_Child.value + "\\"
