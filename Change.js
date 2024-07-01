@@ -192,18 +192,30 @@ function GetIndexWithMaxValue(TABLE) {
     return Max_Index;
 }
 
+function IsNew(NUM, OBJ, DICO) {
+    if (NUM === 'new') {
+        let Type = OBJ.parentElement.parentElement.parentElement.children[0].textContent.slice(0, -2);
+        let Keys = Object.keys(DICO[Type][0]);
+        let Num = Math.max(...Keys.map(Number));
+        return Num + 1;
+    } else {
+        return NUM;
+    }
+}
+
 async function ModifierPage(INPUT, TYPE) {
     var Choix = INPUT.value;
     var Ligne = INPUT.parentElement.parentElement;
     let Datas_Range = await DatasRange();
     let Dico_Return_Past = await DatasVictorySpe2(parseInt(localStorage.getItem(`Where${ANIME}`)));
     let Dico_Return = await DatasVictorySpe(parseInt(localStorage.getItem(`Where${ANIME}`)));
+    let Dico_Return_Spe = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
     var Compteur = 0;
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
         if (Compteur === 1) {
-            Child.innerHTML = Choix + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
+            Child.innerHTML = IsNew(Choix, Child, Dico_Return_Spe) + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
             let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
@@ -360,6 +372,13 @@ async function ModifierPage(INPUT, TYPE) {
                 });
             }
             Child.innerHTML += Text_Temp;
+        } else if (Choix === 'new' && Compteur === 2) {
+            const Nom = prompt(`Quel Nom ?`);
+            Child.innerHTML = `<div><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Nom}"></input></div>`;
+            let Key = IsNew(Choix, Child, Dico_Return_Spe);
+            let DicoTemp = {};
+            DicoTemp[Key] = Nom;
+            let storeName = `MaBaseDeDonneesSpe${ANIME}_${TYPE}`;
         }
         if (Compteur > 1) {
             Child.innerHTML += `<div><button onclick="Add(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Ajouter</button><button onclick="Supp(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Supprimer</button></div>`;

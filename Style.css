@@ -128,7 +128,7 @@ h1 {
     /* Ajouté pour espacer les éléments */
 }
 
-img:not(.logo, .pitite) {
+img:not(.logo, .pitite, .apercu) {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -162,11 +162,39 @@ p {
     margin-right: auto;
 }
 
+.apercu {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 25px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    width: auto;
+}
+
 .vu,
 .mentio {
     justify-content: center;
     display: flex;
     flex-wrap: wrap;
+}
+
+.DivButtonsNav {
+    justify-content: center !important;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.DivButtonsNav a {
+    padding: 5px;
+}
+
+.ButtonsNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 
 .mentio p,
@@ -350,7 +378,8 @@ table img {
 
 .Chapter h1,
 .New h1,
-.Perso h1 {
+.Perso h1,
+.Discord h1 {
     justify-content: space-between;
     margin-left: 10px;
 }
@@ -411,12 +440,14 @@ table img {
 
 #Chapter_Title,
 #New_Title,
-#Perso_Title {
+#Perso_Title,
+#Discord_Title {
     display: flex;
     align-items: center;
 }
 
 .Chapter button,
+.Discord button,
 .New button,
 .Perso button {
     background: none;
@@ -427,6 +458,7 @@ table img {
 }
 
 .Chapter button i,
+.Discord button i,
 .New button i,
 .Perso button i {
     font-size: 1.5em;
@@ -436,6 +468,7 @@ table img {
 }
 
 .Chapter button:focus,
+.Discord button:focus,
 .New button:focus,
 .Perso button:focus {
     outline: none;

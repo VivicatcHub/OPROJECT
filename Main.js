@@ -400,11 +400,60 @@ async function DatasVictory(WHERE, SPE, DATAS) {
     return Dico;
 }
 
+function AfficherButtons(CHAP, WHERE, SUP) {
+    var Text = "";
+    CHAP = parseInt(CHAP);
+    WHERE = parseInt(WHERE);
+    if (CHAP - 10 > 1) {
+        Text += `<a href="index.html?chap=1${SUP}"><button>1</button></a> ←`;
+    }
+    if (CHAP - 10 >= 1) {
+        Text += `<a href="index.html?chap=${CHAP - 10}${SUP}"><button>${CHAP - 10}</button></a> -`;
+    }
+    if (CHAP - 1 >= 1) {
+        Text += `<a href="index.html?chap=${CHAP - 1}${SUP}"><button>${CHAP - 1}</button></a> |`;
+    }
+    if (CHAP + 1 < WHERE) {
+        Text += `| <a href="index.html?chap=${CHAP + 1}${SUP}"><button>${CHAP + 1}</button></a>`;
+    }
+    if (CHAP + 10 < WHERE) {
+        Text += `- <a href="index.html?chap=${CHAP + 10}${SUP}"><button>${CHAP + 10}</button></a>`;
+    }
+    if (WHERE !== CHAP) {
+        Text += `→ <a href="index.html?chap=${WHERE}${SUP}"><button>${WHERE}</button></a>`;
+    }
+    return Text;
+}
+
 async function General() {
     async function Afficher(TYPE, DATA, MAIN) {
         if (TYPE[DATA] === null || MAIN[DATA] === undefined) {
             return "";
         } else {
+            let Affichage = [];
+            MAIN[DATA].split("|").forEach(Type => {
+                console.log("Affichage:", Type, TYPE[DATA]);
+                switch (Type) {
+                    case "Info":
+                        if (MAIN[DATA] === "Info" && Array.isArray(TYPE[DATA])) {
+                            var Temp = DATA + ":<br>"
+                            TYPE[DATA].forEach(Element => {
+                                Temp += Element + "<br>";
+                            });
+                            Affichage.push(Temp);
+                        } else if (Array.isArray(TYPE[DATA])) {
+                            Affichage.push(DATA + ":<br>" + TYPE[DATA][0][0]);
+                        } else {
+                            Affichage.push(DATA + ":<br>" + TYPE[DATA]);
+                        }
+                        break
+                }
+            });
+            if (Affichage[0] !== undefined) {
+                return Affichage.join("<br>");
+            } else {
+                return "";
+            }
             if (MAIN[DATA] == "Info") {
                 return DATA + ":<br>" + TYPE[DATA];
             } else if (MAIN[DATA].includes("|")) {
@@ -487,22 +536,20 @@ async function General() {
                     }
                 }
             }
-            document.getElementById("New_Title").innerHTML = "NOUVEAUX";
             document.getElementById("Perso_Data").innerHTML = Text;
-            document.getElementById("Discord_Title").innerHTML = "DISCORD";
-            // document.getElementById("Discord_Data").innerHTML = `<iframe src="https://discord.com/widget?id=1229847530737500220&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>`;
+            document.getElementById("Discord_Data").innerHTML = `<iframe src="https://discord.com/widget?id=1229847530737500220&theme=dark" width="100%" height="1000px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>`;
 
             // CHAP
         } else if (CHAP !== null && CHAR === null && LIEU === null) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             let Text = "Personnages du chapitre<br><div class='vu'>";
-            if (ChapDatas[CHAP] !== null && ChapDatas[CHAP]["Mentionnés"] !== null && ChapDatas[CHAP]["Mentionnés"][0] !== null) {
+            if (ChapDatas[CHAP] !== null && ChapDatas[CHAP]["Personnages"] !== null && ChapDatas[CHAP]["Personnages"][0] !== null) {
                 for (let k = 0; k <= ChapDatas[CHAP]["Personnages"][0].length; k++) {
                     if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]] !== undefined && ChapDatas[CHAP]["Personnages"][0][k] !== undefined) {
                         if (PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"] !== null) {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"][0][0]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="apercu" src="${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Image"][0][0]}">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                         } else {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Personnages"][0][k]}"><img class="apercu" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Personnages"][0][k]]["Nom"]}</a></p>`;
                         }
                     }
                 }
@@ -514,19 +561,23 @@ async function General() {
                 for (let k = 0; k <= ChapDatas[CHAP]["Mentionnés"][0].length; k++) {
                     if (ChapDatas[CHAP]["Mentionnés"][0][k] !== undefined) {
                         if (PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"] !== null) {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="apercu" src="${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Image"][0]}">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         } else {
-                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
+                            Text += `<p><a href="index.html?chap=${CHAP}&char=${ChapDatas[CHAP]["Mentionnés"][0][k]}"><img class="apercu" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[ChapDatas[CHAP]["Mentionnés"][0][k]]["Nom"]}</a></p>`;
                         }
                     }
                 }
             } else {
                 Text += "<p>Aucun</p>"
             }
-            Text += "</div>"
+            Text += "</div>";
 
             document.getElementById("Character_Name").innerHTML = `TOUS LES PERSOS DU CHAP ${CHAP}`;
             document.getElementById("Data").innerHTML = Text;
+            let NewDiv = document.createElement("div");
+            NewDiv.classList = "ButtonsNav";
+            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, "")}</div>`;
+            document.body.appendChild(NewDiv);
             // CHAR
         } else if (CHAP === null && CHAR !== null && LIEU === null) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
@@ -559,6 +610,10 @@ async function General() {
                 }
             }
             document.getElementById("Data").innerHTML = text.join("<br><br>");
+            let NewDiv = document.createElement("div");
+            NewDiv.classList = "ButtonsNav";
+            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, `&char=${CHAR}`)}</div>`;
+            document.body.appendChild(NewDiv);
         } else if (CHAP !== null && CHAR === null && LIEU !== null) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             document.getElementById("Character_Name").innerHTML = LieuDatas[LIEU]["Nom"];
@@ -596,9 +651,10 @@ async function General() {
             text.push("</div>");
 
             document.getElementById("Data").innerHTML = text.join("<br><br>");
-
-
             document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(CHAP) - 1}&lieu=${LIEU}">-</a>  <a href="index.html?chap=${parseInt(CHAP) + 1}&lieu=${LIEU}">+</a>`;
+            NewDiv.classList = "ButtonsNav";
+            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, "")}</div>`;
+            document.body.appendChild(NewDiv);
         }
     } catch (erreur) {
         console.error(erreur);
