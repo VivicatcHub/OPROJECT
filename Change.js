@@ -209,7 +209,8 @@ async function ModifierPage(INPUT, TYPE) {
     let Datas_Range = await DatasRange();
     let Dico_Return_Past = await DatasVictorySpe2(parseInt(localStorage.getItem(`Where${ANIME}`)));
     let Dico_Return = await DatasVictorySpe(parseInt(localStorage.getItem(`Where${ANIME}`)));
-    let Dico_Return_Spe = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
+    let Dico_Return_Spe = await DatasVictory(10000, true, Datas_Range);
+    let DicoAModif = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), true, Datas_Range);
     var Compteur = 0;
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
@@ -375,10 +376,17 @@ async function ModifierPage(INPUT, TYPE) {
         } else if (Choix === 'new' && Compteur === 2) {
             const Nom = prompt(`Quel Nom ?`);
             Child.innerHTML = `<div><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Nom}"></input></div>`;
-            let Key = IsNew(Choix, Child, Dico_Return_Spe);
-            let DicoTemp = {};
-            DicoTemp[Key] = Nom;
-            let storeName = `MaBaseDeDonneesSpe${ANIME}_${TYPE}`;
+            let Key = IsNew(Choix, Child, Dico_Return_Spe, DicoAModif, TYPE);
+            DicoAModif[TYPE][0][Key] = {
+                Nom: [Nom]
+            };
+            DicoAModif[TYPE][1].forEach(Cat => {
+                if (Cat !== "Nom") {
+                    DicoAModif[TYPE][0][Key][Cat] = null;
+                }
+            });
+            // console.log(Dico_Return);
+            Save(DicoAModif);
         }
         if (Compteur > 1) {
             Child.innerHTML += `<div><button onclick="Add(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Ajouter</button><button onclick="Supp(this, '${Dico_Return_Past["Main"][Column[Compteur]]}')">Supprimer</button></div>`;
@@ -407,6 +415,21 @@ async function ModifierPage(INPUT, TYPE) {
         Compteur = [Compteur[0] + 1, Compteur[1]];
     });
     newRow.innerHTML = Text;
+}
+
+function Save(DICT) {
+    var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}`, I);
+    Request.onsuccess = function (event) {
+        var Db = event.target.result;
+        var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
+        var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
+        var Data = DICT; // Ajouter l'objet à l'objet store
+        Data["id"] = 1;
+        var NewRequest = ObjectStore.put(Data);
+        NewRequest.onsuccess = function (event) {
+            console.log("Objet modifié avec succès ! (Save function)");
+        };
+    };
 }
 
 function Plus(NUM, BOOL, INT, COMPT) {
