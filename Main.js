@@ -155,6 +155,7 @@ function Ordre(VAL, CHAPTERS) {
 
 // FONCTION POUR SAVOIR SI L'EVENEMENT EST ACTUEL
 function InTime(STR, CHAP, CHAPTERS) {
+    console.log(STR, CHAP, CHAPTERS)
     let Data = STR.replaceAll("?", "");
     Data = Data.split("-");
     return parseInt(Ordre(Data[0], CHAPTERS)) <= Ordre(CHAP, CHAPTERS) && (Ordre(Data[1], CHAPTERS) === "" || Ordre(CHAP, CHAPTERS) < parseInt(Ordre(Data[1], CHAPTERS)));
@@ -286,13 +287,13 @@ function WhereOrNot(TYPE, WHERE) {
 }
 
 async function DatasVictory(WHERE, SPE, DATAS) {
-    var LISTE = [];
-    Object.keys(DATAS).forEach(ele => {
-        LISTE.push(ele);
-    })
     var MODIF = localStorage.getItem('Modif');
     if (MODIF === 'true' || SPE === true) {
         try {
+            var LISTE = [];
+            Object.keys(DATAS).forEach(ele => {
+                LISTE.push(ele);
+            })
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS[Element], false), await WhereOrNot(Element, WHERE), Element);
@@ -300,36 +301,34 @@ async function DatasVictory(WHERE, SPE, DATAS) {
             await Promise.all(promises); // Attendre que toutes les promesses se terminent
 
             if (SPE === false) {
-                LISTE.forEach(function (Element) {
-                    var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_${Element}`, I);
+                var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}`, I);
 
-                    Request.onupgradeneeded = function (event) {
-                        var Db = event.target.result;
-                        var ObjectStore = Db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true }); // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+                Request.onupgradeneeded = function (event) {
+                    var Db = event.target.result;
+                    var ObjectStore = Db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true }); // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+                };
+
+                Request.onsuccess = function (event) {
+                    var Db = event.target.result;
+                    var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
+                    var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
+                    var Data = Dico; // Ajouter l'objet à l'objet store
+                    // console.log("Data:", Data, Element);
+                    Data["id"] = 1;
+                    var NewRequest = ObjectStore.put(Data);
+
+                    NewRequest.onsuccess = function (event) {
+                        console.log("Objet modifié avec succès !");
                     };
 
-                    Request.onsuccess = function (event) {
-                        var Db = event.target.result;
-                        var Transaction = Db.transaction(['MonObjet'], 'readwrite'); // Commencer une transaction en mode lecture-écriture
-                        var ObjectStore = Transaction.objectStore('MonObjet'); // Récupérer l'objet store
-                        Data = Dico[Element]; // Ajouter l'objet à l'objet store
-                        // console.log("Data:", Data, Element);
-                        Data["id"] = 1;
-                        var NewRequest = ObjectStore.put(Data);
-
-                        NewRequest.onsuccess = function (event) {
-                            console.log("Objet modifié avec succès !");
-                        };
-
-                        NewRequest.onerror = function (event) {
-                            console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
-                        };
+                    NewRequest.onerror = function (event) {
+                        console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
                     };
+                };
 
-                    Request.onerror = function (event) {
-                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error, Element);
-                    };
-                });
+                Request.onerror = function (event) {
+                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error, Element);
+                };
             }
 
         } catch (error) {
@@ -343,51 +342,49 @@ async function DatasVictory(WHERE, SPE, DATAS) {
     else {
         var Dico = {};
         try {
-            var Promesses = [];
-            LISTE.forEach(function (Element) {
-                var Promesse = new Promise(function (Resolve, Reject) {
-                    var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}_${Element}`, I);
+            var Promesse = new Promise(function (Resolve, Reject) {
+                var Request = indexedDB.open(`MaBaseDeDonnees${ANIME}`, I);
 
-                    Request.onsuccess = function (event) {
-                        var Db = event.target.result; // Obtention de la référence à la base de données ouverte
-                        var Transaction = Db.transaction(['MonObjet'], 'readonly'); // Utilisation de la base de données pour effectuer des opérations | par exemple, récupérer des données depuis un objet store
-                        var ObjectStore = Transaction.objectStore('MonObjet');
-                        var GetRequest = ObjectStore.get(1);
+                Request.onsuccess = function (event) {
+                    var Db = event.target.result; // Obtention de la référence à la base de données ouverte
+                    var Transaction = Db.transaction(['MonObjet'], 'readonly'); // Utilisation de la base de données pour effectuer des opérations | par exemple, récupérer des données depuis un objet store
+                    var ObjectStore = Transaction.objectStore('MonObjet');
+                    var GetRequest = ObjectStore.get(1);
 
-                        GetRequest.onsuccess = function (event) {
-                            Dico[Element] = GetRequest.result;
-                            // console.log("Récupération réussie pour :", Element)
-                            Resolve();
-                        };
-
-                        GetRequest.onerror = function (event) {
-                            console.error("Erreur lors de la récupération de l'objet :", event.target.error);
-                            Reject(event.target.error);
-                        };
+                    GetRequest.onsuccess = function (event) {
+                        Dico = GetRequest.result;
+                        // console.log("Récupération réussie pour :", Element)
+                        Resolve();
                     };
 
-                    Request.onerror = function (event) {
-                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    GetRequest.onerror = function (event) {
+                        console.error("Erreur lors de la récupération de l'objet :", event.target.error);
                         Reject(event.target.error);
                     };
+                };
 
-                    Request.onupgradeneeded = async function (event) {
-                        MODIF = 'true';
-                        localStorage.setItem('Modif', MODIF);
-                        I++;
-                        localStorage.setItem('I', I);
-                        location.reload();
-                    };
-                });
-                Promesses.push(Promesse);
+                Request.onerror = function (event) {
+                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    Reject(event.target.error);
+                };
+
+                Request.onupgradeneeded = async function (event) {
+                    MODIF = 'true';
+                    localStorage.setItem('Modif', MODIF);
+                    I++;
+                    localStorage.setItem('I', I);
+                    location.reload();
+                };
             });
-            await Promise.all(Promesses).catch(function (error) {
-                console.error('Une erreur est survenue lors de la récupération des données :', error);
-            });
+            await Promesse;
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
             var Dico = {};
+            var LISTE = [];
+            Object.keys(DATAS).forEach(ele => {
+                LISTE.push(ele);
+            })
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS[Element], false), await WhereOrNot(Element, WHERE), Element);
             });
@@ -426,27 +423,48 @@ function AfficherButtons(CHAP, WHERE, SUP) {
 }
 
 async function General() {
-    async function Afficher(TYPE, DATA, MAIN) {
+    async function Afficher(TYPE, DATA, MAIN, DICT, LINK) {
         if (TYPE[DATA] === null || MAIN[DATA] === undefined) {
             return "";
         } else {
-            let Affichage = [];
-            MAIN[DATA].split("|").forEach(Type => {
-                console.log("Affichage:", Type, TYPE[DATA]);
-                switch (Type) {
-                    case "Info":
-                        if (MAIN[DATA] === "Info" && Array.isArray(TYPE[DATA])) {
-                            var Temp = DATA + ":<br>"
-                            TYPE[DATA].forEach(Element => {
-                                Temp += Element + "<br>";
-                            });
-                            Affichage.push(Temp);
-                        } else if (Array.isArray(TYPE[DATA])) {
-                            Affichage.push(DATA + ":<br>" + TYPE[DATA][0][0]);
-                        } else {
-                            Affichage.push(DATA + ":<br>" + TYPE[DATA]);
-                        }
-                        break
+            let Affichage = [DATA];
+            let Types = MAIN[DATA].split("|");
+            TYPE[DATA].forEach(Element => {
+                var TempList = "";
+                Types.forEach(Type => {
+                    switch (Type) {
+                        case "Info":
+                            if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") {
+                                if (MAIN[DATA] === "Info" && Array.isArray(TYPE[DATA])) {
+                                    TYPE[DATA].forEach(Element => {
+                                        TempList += Element + "<br>";
+                                    });
+                                } else if (Array.isArray(TYPE[DATA])) {
+                                    TempList += TYPE[DATA][0][0];
+                                } else {
+                                    TempList += TYPE[DATA];
+                                }
+                            }
+                            break;
+                        case "Infos":
+                            if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") { TempList += " (" + Element[1] + ")"; }
+                            break;
+                        case "Duree":
+                            break;
+                        default:
+                            // console.log("Afficher - Type:", Type)
+                            if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") {
+                                if (DICT[Type][0][Element[0]]['Image'] === undefined || DICT[Type][0][Element[0]]['Image'] === null) {
+                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + Element[0] + "'>" + DICT[Type][0][Element[0]]['Nom'] + "</a>";
+                                } else {
+                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + Element[0] + "'><img class='pitite' src='" + DICT[Type][0][Element[0]]['Image'] + "'>" + DICT[Type][0][Element[0]]['Nom'] + "</a>";
+                                }
+                            }
+                            break;
+                    }
+                })
+                if (TempList !== "") {
+                    Affichage.push(TempList);
                 }
             });
             if (Affichage[0] !== undefined) {
@@ -505,12 +523,17 @@ async function General() {
     console.log("Datas:", Datas);
 
     try {
-        let dicoReturn = await DatasVictory(WHERE, false, Datas);
+        var dicoReturn = await DatasVictory(WHERE, false, Datas);
         console.log("dicoReturn:", dicoReturn);
         var MainDatas = dicoReturn["Main"];
         var [PersoDatas, PersoDatasColumns] = dicoReturn["Perso"];
         var [LieuDatas, LieuDatasColumns] = dicoReturn["Lieu"];
         var [ChapDatas, ChapDatasColumns] = dicoReturn["Chapter"];
+
+        var Link = {};
+        dicoReturn["Link"][0].forEach(Element => {
+            Link[Element["Catégorie"]] = Element["ShortName"];
+        });
 
         // RIEN
         if (CHAP === null && CHAR === null && LIEU === null) {
@@ -603,7 +626,7 @@ async function General() {
                 } else if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
                     text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]][0][0] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
                 } else {
-                    result = await Afficher(PersoDatas[CHAR], PersoDatasColumns[i], MainDatas);
+                    result = await Afficher(PersoDatas[CHAR], PersoDatasColumns[i], MainDatas, dicoReturn, Link);
                     if (result !== "") {
                         text.push(result);
                     }
@@ -624,7 +647,7 @@ async function General() {
                 } else if (LieuDatasColumns[i] === "Image" && LieuDatas[LIEU][LieuDatasColumns[i]] !== null) {
                     text.unshift("<img src='" + LieuDatas[LIEU][LieuDatasColumns[i]] + "' alt='" + LieuDatas[LIEU]["Nom"] + "'>");
                 } else {
-                    result = await Afficher(LieuDatas[LIEU], LieuDatasColumns[i], MainDatas);
+                    result = await Afficher(LieuDatas[LIEU], LieuDatasColumns[i], MainDatas, dicoReturn, Link);
                     if (result !== "") {
                         text.push(result);
                     }

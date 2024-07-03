@@ -488,13 +488,13 @@ function Transfo() {
 async function DatasVictorySpe(WHERE) {
     let DATAS_RANGE = await DatasRange();
     console.log(DATAS_RANGE)
-    var LISTE = [];
-    Object.keys(DATAS_RANGE).forEach(ele => {
-        LISTE.push(ele);
-    })
     var modif = localStorage.getItem('ModifSpe');
     if (modif === 'true' || modif) {
         try {
+            var LISTE = [];
+            Object.keys(DATAS_RANGE).forEach(ele => {
+                LISTE.push(ele);
+            })
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element, true);
@@ -503,39 +503,37 @@ async function DatasVictorySpe(WHERE) {
 
             // console.log(dico);
 
-            LISTE.forEach(function (Element) {
-                var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}_${Element}`, I);
+            var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}`, I);
 
-                request.onupgradeneeded = function (event) {
-                    var db = event.target.result;
-                    // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
-                    var objectStore = db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true });
+            request.onupgradeneeded = function (event) {
+                var db = event.target.result;
+                // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+                var objectStore = db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true });
+            };
+
+            request.onsuccess = function (event) {
+                var db = event.target.result;
+                // Commencer une transaction en mode lecture-écriture
+                var transaction = db.transaction(['MonObjet'], 'readwrite');
+                // Récupérer l'objet store
+                var objectStore = transaction.objectStore('MonObjet');
+                // Ajouter l'objet à l'objet store
+                var Data = Dico;
+                Data["id"] = 1;
+                var NewRequest = objectStore.put(Data);
+
+                NewRequest.onsuccess = function (event) {
+                    // console.log("Objet modifié avec succès !");
                 };
 
-                request.onsuccess = function (event) {
-                    var db = event.target.result;
-                    // Commencer une transaction en mode lecture-écriture
-                    var transaction = db.transaction(['MonObjet'], 'readwrite');
-                    // Récupérer l'objet store
-                    var objectStore = transaction.objectStore('MonObjet');
-                    // Ajouter l'objet à l'objet store
-                    Data = Dico[Element];
-                    Data["id"] = 1;
-                    var NewRequest = objectStore.put(Data);
-
-                    NewRequest.onsuccess = function (event) {
-                        // console.log("Objet modifié avec succès !");
-                    };
-
-                    NewRequest.onerror = function (event) {
-                        console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
-                    };
+                NewRequest.onerror = function (event) {
+                    console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
                 };
+            };
 
-                request.onerror = function (event) {
-                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
-                };
-            });
+            request.onerror = function (event) {
+                console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+            };
         } catch (error) {
             console.error('Une erreur est survenue :', error);
         }
@@ -545,54 +543,52 @@ async function DatasVictorySpe(WHERE) {
     } else {
         var Dico = {};
         try {
-            var promesses = [];
-            LISTE.forEach(function (Element) {
-                var promesse = new Promise(function (resolve, reject) {
-                    var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}_${Element}`, I);
+            var promesse = new Promise(function (resolve, reject) {
+                var request = indexedDB.open(`MaBaseDeDonneesSpe${ANIME}`, I);
 
-                    request.onsuccess = function (event) {
-                        // Obtention de la référence à la base de données ouverte
-                        var db = event.target.result;
-                        // Utilisation de la base de données pour effectuer des opérations
-                        // par exemple, récupérer des données depuis un objet store
-                        var transaction = db.transaction(['MonObjet'], 'readonly');
-                        var objectStore = transaction.objectStore('MonObjet');
-                        var getRequest = objectStore.get(1);
+                request.onsuccess = function (event) {
+                    // Obtention de la référence à la base de données ouverte
+                    var db = event.target.result;
+                    // Utilisation de la base de données pour effectuer des opérations
+                    // par exemple, récupérer des données depuis un objet store
+                    var transaction = db.transaction(['MonObjet'], 'readonly');
+                    var objectStore = transaction.objectStore('MonObjet');
+                    var getRequest = objectStore.get(1);
 
-                        getRequest.onsuccess = function (event) {
-                            Dico[Element] = getRequest.result;
-                            // console.log("Récupération réussie pour :", Element)
-                            resolve();
-                        };
-
-                        getRequest.onerror = function (event) {
-                            console.error("Erreur lors de la récupération de l'objet :", event.target.error);
-                            reject(event.target.error);
-                        };
+                    getRequest.onsuccess = function (event) {
+                        Dico = getRequest.result;
+                        // console.log("Récupération réussie pour :", Element)
+                        resolve();
                     };
 
-                    request.onerror = function (event) {
-                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    getRequest.onerror = function (event) {
+                        console.error("Erreur lors de la récupération de l'objet :", event.target.error);
                         reject(event.target.error);
                     };
+                };
 
-                    request.onupgradeneeded = async function (event) {
-                        modif = 'true';
-                        localStorage.setItem('ModifSpe', modif);
-                        I++;
-                        localStorage.setItem('I', I);
-                        location.reload();
-                    };
-                });
-                promesses.push(promesse);
+                request.onerror = function (event) {
+                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    reject(event.target.error);
+                };
+
+                request.onupgradeneeded = async function (event) {
+                    modif = 'true';
+                    localStorage.setItem('ModifSpe', modif);
+                    I++;
+                    localStorage.setItem('I', I);
+                    location.reload();
+                };
             });
-            await Promise.all(promesses).catch(function (error) {
-                console.error('Une erreur est survenue lors de la récupération des données :', error);
-            });
+            await promesse;
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
             var Dico = {};
+            var LISTE = [];
+            Object.keys(DATAS_RANGE).forEach(ele => {
+                LISTE.push(ele);
+            })
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element, true);
             });
@@ -607,15 +603,14 @@ async function DatasVictorySpe(WHERE) {
 
 async function DatasVictorySpe2(WHERE) {
     let DATAS_RANGE = await DatasRange();
-    var LISTE = [];
-    Object.keys(DATAS_RANGE).forEach(ele => {
-        LISTE.push(ele);
-    })
-    // console.log(LISTE);
     var modif = localStorage.getItem('ModifSpe2');
     WHERE = String(Number(WHERE) - 1);
     if (modif === 'true' || modif) {
         try {
+            var LISTE = [];
+            Object.keys(DATAS_RANGE).forEach(ele => {
+                LISTE.push(ele);
+            })
             var Dico = {};
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element, false);
@@ -624,39 +619,37 @@ async function DatasVictorySpe2(WHERE) {
 
             // console.log(dico);
 
-            LISTE.forEach(function (Element) {
-                var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}_${Element}`, I);
+            var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}`, I);
 
-                request.onupgradeneeded = function (event) {
-                    var db = event.target.result;
-                    // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
-                    var objectStore = db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true });
+            request.onupgradeneeded = function (event) {
+                var db = event.target.result;
+                // Créer un objetStore (équivalent à une table dans une base de données relationnelle)
+                var objectStore = db.createObjectStore('MonObjet', { keyPath: 'id', autoIncrement: true });
+            };
+
+            request.onsuccess = function (event) {
+                var db = event.target.result;
+                // Commencer une transaction en mode lecture-écriture
+                var transaction = db.transaction(['MonObjet'], 'readwrite');
+                // Récupérer l'objet store
+                var objectStore = transaction.objectStore('MonObjet');
+                // Ajouter l'objet à l'objet store
+                var Data = Dico;
+                Data["id"] = 1;
+                var NewRequest = objectStore.put(Data);
+
+                NewRequest.onsuccess = function (event) {
+                    // console.log("Objet modifié avec succès !");
                 };
 
-                request.onsuccess = function (event) {
-                    var db = event.target.result;
-                    // Commencer une transaction en mode lecture-écriture
-                    var transaction = db.transaction(['MonObjet'], 'readwrite');
-                    // Récupérer l'objet store
-                    var objectStore = transaction.objectStore('MonObjet');
-                    // Ajouter l'objet à l'objet store
-                    Data = Dico[Element];
-                    Data["id"] = 1;
-                    var NewRequest = objectStore.put(Data);
-
-                    NewRequest.onsuccess = function (event) {
-                        // console.log("Objet modifié avec succès !");
-                    };
-
-                    NewRequest.onerror = function (event) {
-                        console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
-                    };
+                NewRequest.onerror = function (event) {
+                    console.error("Erreur lors de l'ajout de l'objet :", event.target.error);
                 };
+            };
 
-                request.onerror = function (event) {
-                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
-                };
-            });
+            request.onerror = function (event) {
+                console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+            };
         } catch (error) {
             console.error('Une erreur est survenue :', error);
         }
@@ -666,54 +659,52 @@ async function DatasVictorySpe2(WHERE) {
     } else {
         var Dico = {};
         try {
-            var promesses = [];
-            LISTE.forEach(function (Element) {
-                var promesse = new Promise(function (resolve, reject) {
-                    var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}_${Element}`, I);
+            var promesse = new Promise(function (resolve, reject) {
+                var request = indexedDB.open(`MaBaseDeDonneesSpe2${ANIME}`, I);
 
-                    request.onsuccess = function (event) {
-                        // Obtention de la référence à la base de données ouverte
-                        var db = event.target.result;
-                        // Utilisation de la base de données pour effectuer des opérations
-                        // par exemple, récupérer des données depuis un objet store
-                        var transaction = db.transaction(['MonObjet'], 'readonly');
-                        var objectStore = transaction.objectStore('MonObjet');
-                        var getRequest = objectStore.get(1);
+                request.onsuccess = function (event) {
+                    // Obtention de la référence à la base de données ouverte
+                    var db = event.target.result;
+                    // Utilisation de la base de données pour effectuer des opérations
+                    // par exemple, récupérer des données depuis un objet store
+                    var transaction = db.transaction(['MonObjet'], 'readonly');
+                    var objectStore = transaction.objectStore('MonObjet');
+                    var getRequest = objectStore.get(1);
 
-                        getRequest.onsuccess = function (event) {
-                            Dico[Element] = getRequest.result;
-                            // console.log("Récupération réussie pour :", Element)
-                            resolve();
-                        };
-
-                        getRequest.onerror = function (event) {
-                            console.error("Erreur lors de la récupération de l'objet :", event.target.error);
-                            reject(event.target.error);
-                        };
+                    getRequest.onsuccess = function (event) {
+                        Dico = getRequest.result;
+                        // console.log("Récupération réussie pour :", Element)
+                        resolve();
                     };
 
-                    request.onerror = function (event) {
-                        console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    getRequest.onerror = function (event) {
+                        console.error("Erreur lors de la récupération de l'objet :", event.target.error);
                         reject(event.target.error);
                     };
+                };
 
-                    request.onupgradeneeded = async function (event) {
-                        modif = 'true';
-                        localStorage.setItem('ModifSpe2', modif);
-                        I++;
-                        localStorage.setItem('I', I);
-                        location.reload();
-                    };
-                });
-                promesses.push(promesse);
+                request.onerror = function (event) {
+                    console.error("Erreur lors de l'ouverture de la base de données :", event.target.error);
+                    reject(event.target.error);
+                };
+
+                request.onupgradeneeded = async function (event) {
+                    modif = 'true';
+                    localStorage.setItem('ModifSpe2', modif);
+                    I++;
+                    localStorage.setItem('I', I);
+                    location.reload();
+                };
             });
-            await Promise.all(promesses).catch(function (error) {
-                console.error('Une erreur est survenue lors de la récupération des données :', error);
-            });
+            await promesse;
 
         } catch (error) {
             console.error('Une erreur est survenue :', error);
             var Dico = {};
+            var LISTE = [];
+            Object.keys(DATAS_RANGE).forEach(ele => {
+                LISTE.push(ele);
+            })
             var promises = LISTE.map(async function (Element) { // Création d'un tableau de promesses
                 Dico[Element] = await TraiterSheetDatas(await RecupSheetDatas(SHEET_ID, Element, DATAS_RANGE[Element]), await WhereOrNot(Element, WHERE), Element, false);
             });
