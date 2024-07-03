@@ -783,7 +783,7 @@ async function GeneralModif() {
     var Div_Pro = document.getElementById("modification");
     var Liste = [];
     Object.keys(Datas_Range).forEach(element => {
-        if (!(["Chapter", "Main", "id"].includes(element))) {
+        if (!(["Chapter", "Main", "id", "Link"].includes(element))) {
             Liste.push(Dico_Return_Past[element].concat([element]));
         }
     })

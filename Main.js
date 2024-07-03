@@ -12,7 +12,6 @@ if (II === null) {
 }
 var CHAR = (new URLSearchParams(window.location.search)).get('char');
 var CHAP = (new URLSearchParams(window.location.search)).get('chap');
-var LIEU = (new URLSearchParams(window.location.search)).get('lieu');
 
 
 async function RecupSheetDatas(ID, TITLE, RANGE) {
@@ -155,7 +154,7 @@ function Ordre(VAL, CHAPTERS) {
 
 // FONCTION POUR SAVOIR SI L'EVENEMENT EST ACTUEL
 function InTime(STR, CHAP, CHAPTERS) {
-    // console.log(STR, CHAP, CHAPTERS)
+    // console.log("InTime", STR, CHAP, CHAPTERS)
     let Data = STR.replaceAll("?", "");
     Data = Data.split("-");
     return parseInt(Ordre(Data[0], CHAPTERS)) <= Ordre(CHAP, CHAPTERS) && (Ordre(Data[1], CHAPTERS) === "" || Ordre(CHAP, CHAPTERS) < parseInt(Ordre(Data[1], CHAPTERS)));
@@ -401,13 +400,13 @@ function AfficherButtons(CHAP, WHERE, SUP) {
     var Text = "";
     CHAP = parseInt(CHAP);
     WHERE = parseInt(WHERE);
-    if (CHAP - 10 > 1) {
+    if (CHAP > 1) {
         Text += `<a href="index.html?chap=1${SUP}"><button>1</button></a> ←`;
     }
-    if (CHAP - 10 >= 1) {
+    if (CHAP >= 12) {
         Text += `<a href="index.html?chap=${CHAP - 10}${SUP}"><button>${CHAP - 10}</button></a> -`;
     }
-    if (CHAP - 1 >= 1) {
+    if (CHAP >= 3) {
         Text += `<a href="index.html?chap=${CHAP - 1}${SUP}"><button>${CHAP - 1}</button></a> |`;
     }
     if (CHAP + 1 < WHERE) {
@@ -420,6 +419,23 @@ function AfficherButtons(CHAP, WHERE, SUP) {
         Text += `→ <a href="index.html?chap=${WHERE}${SUP}"><button>${WHERE}</button></a>`;
     }
     return Text;
+}
+
+function AllNull(DICT) {
+    for (let key in DICT) {
+        if (key !== "chap" && DICT[key]["Numero"] !== null) {
+            return false
+        }
+    }
+    return true
+}
+
+function FirstNoNull(DICT) {
+    for (let key in DICT) {
+        if (key !== "chap" && DICT[key]["Numero"] !== null) {
+            return DICT[key];
+        }
+    }
 }
 
 async function General() {
@@ -467,7 +483,7 @@ async function General() {
                     Affichage.push(TempList);
                 }
             });
-            if (Affichage[0] !== undefined || Affichage.length === 1) {
+            if (Affichage[0] !== undefined && Affichage.length !== 1) {
                 return Affichage.join("<br>");
             } else {
                 return "";
@@ -482,15 +498,40 @@ async function General() {
         console.log("dicoReturn:", dicoReturn);
         var MainDatas = dicoReturn["Main"];
         var [PersoDatas, PersoDatasColumns] = dicoReturn["Perso"];
-        var [LieuDatas, LieuDatasColumns] = dicoReturn["Lieu"];
         var [ChapDatas, ChapDatasColumns] = dicoReturn["Chapter"];
 
         var Link = {};
+        var Linked = {};
         dicoReturn["Link"][0].forEach(Element => {
             Link[Element["Catégorie"]] = Element["ShortName"];
+            if (Linked[Element["Catégorie"]] !== undefined) {
+                Linked[Element["Catégorie"]]["Link"].push({
+                    Lien: Element["Lien"],
+                    NomLien: Element["NomLien"],
+                    Duree: Element["Duree"],
+                    Colonne: Element["Colonne"]
+                })
+            } else {
+                Linked[Element["Catégorie"]] = {
+                    ShortName: Element["ShortName"],
+                    Link: [{
+                        Lien: Element["Lien"],
+                        NomLien: Element["NomLien"],
+                        Duree: Element["Duree"],
+                        Colonne: Element["Colonne"]
+                    }]
+                }
+            }
+        });
+        // console.log(Linked)
+
+        ShortNames = {}
+        Object.keys(Link).forEach(l => {
+            ShortNames[Link[l]] = { Numero: (new URLSearchParams(window.location.search)).get(Link[l]), Nom: l };
         });
 
         // RIEN
+        // console.log(ShortNames, AllNull(ShortNames));
         if (CHAP === null) {
             let Text = "";
             for (let k = 0; k <= WHERE; k++) {
@@ -518,7 +559,7 @@ async function General() {
             document.getElementById("Discord_Data").innerHTML = `<iframe src="https://discord.com/widget?id=1229847530737500220&theme=dark" width="100%" height="1000px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>`;
 
             // CHAP
-        } else if (CHAP !== null && CHAR === null) {
+        } else if (CHAP !== null && AllNull(ShortNames)) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             let Text = "Personnages du chapitre<br><div class='vu'>";
             if (ChapDatas[CHAP] !== null && ChapDatas[CHAP]["Personnages"] !== null && ChapDatas[CHAP]["Personnages"][0] !== null) {
@@ -557,67 +598,61 @@ async function General() {
             NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, "")}</div>`;
             document.body.appendChild(NewDiv);
             // CHAR
-        } else if (CHAP !== null && CHAR !== null) {
+        } else if (CHAP !== null && !AllNull(ShortNames)) {
+            let ValNoNull = FirstNoNull(ShortNames)["Numero"];
+            let Type = FirstNoNull(ShortNames)["Nom"];
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
-            document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
+            document.getElementById("Character_Name").innerHTML = dicoReturn[Type][0][ValNoNull]["Nom"];
             var text = [];
-            for (let i = 1; i < PersoDatasColumns.length; i++) {
-                if (PersoDatasColumns[i] === "Numéro" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
+            for (let i = 1; i < dicoReturn[Type][1].length; i++) {
+                if (dicoReturn[Type][1][i] === "Numéro" && dicoReturn[Type][0][ValNoNull][dicoReturn[Type][1][i]] !== null) {
                     continue;
-                } else if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]][0][0] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
+                } else if (dicoReturn[Type][1][i] === "Image" && dicoReturn[Type][0][ValNoNull][dicoReturn[Type][1][i]] !== null) {
+                    text.unshift("<img src='" + dicoReturn[Type][0][ValNoNull][dicoReturn[Type][1][i]][0][0] + "' alt='" + dicoReturn[Type][0][ValNoNull]["Nom"] + "'>");
                 } else {
-                    result = await Afficher(PersoDatas[CHAR], PersoDatasColumns[i], MainDatas, dicoReturn, Link);
+                    result = await Afficher(dicoReturn[Type][0][ValNoNull], dicoReturn[Type][1][i], MainDatas, dicoReturn, Link);
                     if (result !== "") {
                         text.push(result);
                     }
                 }
             }
-            document.getElementById("Data").innerHTML = text.join("<br><br>");
-            let NewDiv = document.createElement("div");
-            NewDiv.classList = "ButtonsNav";
-            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, `&char=${CHAR}`)}</div>`;
-            document.body.appendChild(NewDiv);
-        } else if (CHAP !== null && CHAR === null && LIEU !== null) {
-            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
-            document.getElementById("Character_Name").innerHTML = LieuDatas[LIEU]["Nom"];
-            var text = [];
-            for (let i = 1; i < LieuDatasColumns.length; i++) {
-                if (LieuDatasColumns[i] === "Numéro" && LieuDatas[LIEU][LieuDatasColumns[i]] !== null) {
-                    continue;
-                } else if (LieuDatasColumns[i] === "Image" && LieuDatas[LIEU][LieuDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + LieuDatas[LIEU][LieuDatasColumns[i]] + "' alt='" + LieuDatas[LIEU]["Nom"] + "'>");
-                } else {
-                    result = await Afficher(LieuDatas[LIEU], LieuDatasColumns[i], MainDatas, dicoReturn, Link);
-                    if (result !== "") {
-                        text.push(result);
-                    }
-                }
-            }
-            let Affichage = "Présent:<br><div class='vu'>";
-            for (let i = 0; i < PersoDatas.length; i++) {
-                if (PersoDatas[i]["Lieu"] !== null) {
-                    for (let j = 0; j < PersoDatas[i]["Lieu"].length; j++) {
-                        if (PersoDatas[i]["Lieu"][j][0] === LIEU && InTime(PersoDatas[i]["Lieu"][j][1], CHAP, ChapDatas)) {
-                            if (PersoDatas[i]["Image"] !== null) {
-                                Affichage += `<p><a href="index.html?chap=${CHAP}&char=${i}"><img class="pitite" src="${PersoDatas[i]["Image"]}">${PersoDatas[i]["Nom"]}</a></p>`;
-                            } else {
-                                Affichage += `<p><a href="index.html?chap=${CHAP}&char=${i}"><img class="pitite" src="https://images.assetsdelivery.com/compings_v2/kritchanut/kritchanut1406/kritchanut140600093.jpg">${PersoDatas[i]["Nom"]}</a></p>`;
+
+            Linked[Type]["Link"].forEach(a => {
+                var Temp = [a["NomLien"]];
+                dicoReturn[a["Lien"]][0].forEach(b => {
+                    if (Array.isArray(b[a["Colonne"]]) && Array.isArray(b[a["Colonne"]][0])) {
+                        b[a["Colonne"]].forEach(Each => {
+                            if (a["Duree"][0] === "False" || (a["Duree"][0] === "True" && b[a["Colonne"]]!== null && InTime(Each[Each.length - 1], CHAP, dicoReturn["Chapter"][0]))) {
+                                if (Each !== null && Each.includes(ValNoNull)) {
+                                    if (a["Lien"][0] === "Chapter") {
+                                        Temp.push("<a href='index.html?chap=" + dicoReturn[a["Lien"]][0].indexOf(b) + "'>" + b["Nom"] + "</a>");
+                                    } else {
+                                        Temp.push("<a href='index.html?chap=" + CHAP + "&" + Link[a["Lien"][0]][0] + "=" + dicoReturn[a["Lien"]][0].indexOf(b) + "'>" + b["Nom"] + "</a>");
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        if (a["Duree"][0] === "False" || (a["Duree"][0] === "True" && b[a["Colonne"]]!== null && InTime(b[a["Colonne"]][b[a["Colonne"]].length - 1], CHAP, dicoReturn["Chapter"][0]))) {
+                            if (b[a["Colonne"]] !== null && b[a["Colonne"]].includes(ValNoNull)) {
+                                if (a["Lien"][0] === "Chapter") {
+                                    Temp.push("<a href='index.html?chap=" + dicoReturn[a["Lien"]][0].indexOf(b) + "'>" + b["Nom"] + "</a>");
+                                } else {
+                                    Temp.push("<a href='index.html?chap=" + CHAP + "&" + Link[a["Lien"][0]][0] + "=" + dicoReturn[a["Lien"]][0].indexOf(b) + "'>" + b["Nom"] + "</a>");
+                                }
                             }
                         }
                     }
+                });
+                if (Temp.length !== 1) {
+                    text.push(Temp.join("<br>"));
                 }
-            }
-            text.push(Affichage);
-            if (I === 0) {
-                text.push("Aucun");
-            }
-            text.push("</div>");
+            });
 
             document.getElementById("Data").innerHTML = text.join("<br><br>");
-            document.getElementById("naviguer").innerHTML = `<a href="index.html?chap=${parseInt(CHAP) - 1}&lieu=${LIEU}">-</a>  <a href="index.html?chap=${parseInt(CHAP) + 1}&lieu=${LIEU}">+</a>`;
+            let NewDiv = document.createElement("div");
             NewDiv.classList = "ButtonsNav";
-            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, "")}</div>`;
+            NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, `&${Link[Type]}=${ValNoNull}`)}</div>`;
             document.body.appendChild(NewDiv);
         }
     } catch (erreur) {
