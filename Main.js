@@ -155,7 +155,7 @@ function Ordre(VAL, CHAPTERS) {
 
 // FONCTION POUR SAVOIR SI L'EVENEMENT EST ACTUEL
 function InTime(STR, CHAP, CHAPTERS) {
-    console.log(STR, CHAP, CHAPTERS)
+    // console.log(STR, CHAP, CHAPTERS)
     let Data = STR.replaceAll("?", "");
     Data = Data.split("-");
     return parseInt(Ordre(Data[0], CHAPTERS)) <= Ordre(CHAP, CHAPTERS) && (Ordre(Data[1], CHAPTERS) === "" || Ordre(CHAP, CHAPTERS) < parseInt(Ordre(Data[1], CHAPTERS)));
@@ -437,7 +437,7 @@ async function General() {
                             if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") {
                                 if (MAIN[DATA] === "Info" && Array.isArray(TYPE[DATA])) {
                                     TYPE[DATA].forEach(Element => {
-                                        TempList += Element + "<br>";
+                                        TempList += Element;
                                     });
                                 } else if (Array.isArray(TYPE[DATA])) {
                                     TempList += TYPE[DATA][0][0];
@@ -467,53 +467,8 @@ async function General() {
                     Affichage.push(TempList);
                 }
             });
-            if (Affichage[0] !== undefined) {
+            if (Affichage[0] !== undefined || Affichage.length === 1) {
                 return Affichage.join("<br>");
-            } else {
-                return "";
-            }
-            if (MAIN[DATA] == "Info") {
-                return DATA + ":<br>" + TYPE[DATA];
-            } else if (MAIN[DATA].includes("|")) {
-                let Affichage = [];
-                if (MAIN[DATA] == "Info|Duree") {
-                    for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0]);
-                        } else if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas)) {
-                            Affichage.push(TYPE[DATA][l][0]);
-                        }
-                    }
-                } else if (MAIN[DATA] == "Info|Infos|Duree") {
-                    for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][2], CHAP, ChapDatas) && Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br>" + TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
-                        } else if (InTime(TYPE[DATA][l][2], CHAP, ChapDatas)) {
-                            Affichage.push(TYPE[DATA][l][0] + "  -  " + TYPE[DATA][l][1]);
-                        }
-                    }
-                } else if (MAIN[DATA] == "Lieu|Duree") {
-                    for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas) && Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
-                        } else if (InTime(TYPE[DATA][l][1], CHAP, ChapDatas)) {
-                            Affichage.push("<a href='index.html?chap=" + CHAP + "&lieu=" + TYPE[DATA][l][0] + "'>" + LieuDatas[TYPE[DATA][l][0]]['Nom'] + "</a>");
-                        }
-                    }
-                } else if (MAIN[DATA] == "Perso|Infos") {
-                    for (let l = 0; l < TYPE[DATA].length; l++) {
-                        if (Affichage[0] === undefined) {
-                            Affichage.push(DATA + ":<br><a href='index.html?chap=" + CHAP + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
-                        } else {
-                            Affichage.push("<a href='index.html?chap=" + CHAP + "&char=" + TYPE[DATA][l][0] + "'>" + PersoDatas[TYPE[DATA][l][0]]['Nom'] + "</a> (" + TYPE[DATA][l][1] + ")");
-                        }
-                    }
-                }
-                if (Affichage[0] !== undefined) {
-                    return Affichage.join("<br>");
-                } else {
-                    return "";
-                }
             } else {
                 return "";
             }
@@ -536,7 +491,7 @@ async function General() {
         });
 
         // RIEN
-        if (CHAP === null && CHAR === null && LIEU === null) {
+        if (CHAP === null) {
             let Text = "";
             for (let k = 0; k <= WHERE; k++) {
                 if (ChapDatas[k] !== undefined) {
@@ -563,7 +518,7 @@ async function General() {
             document.getElementById("Discord_Data").innerHTML = `<iframe src="https://discord.com/widget?id=1229847530737500220&theme=dark" width="100%" height="1000px" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>`;
 
             // CHAP
-        } else if (CHAP !== null && CHAR === null && LIEU === null) {
+        } else if (CHAP !== null && CHAR === null) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             let Text = "Personnages du chapitre<br><div class='vu'>";
             if (ChapDatas[CHAP] !== null && ChapDatas[CHAP]["Personnages"] !== null && ChapDatas[CHAP]["Personnages"][0] !== null) {
@@ -602,21 +557,7 @@ async function General() {
             NewDiv.innerHTML = `<div class="DivButtonsNav">${AfficherButtons(CHAP, WHERE, "")}</div>`;
             document.body.appendChild(NewDiv);
             // CHAR
-        } else if (CHAP === null && CHAR !== null && LIEU === null) {
-            if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
-            document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
-            var text = [];
-            for (let i = 1; i < PersoDatasColumns.length; i++) {
-                if (PersoDatasColumns[i] === "Image" && PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
-                    text.unshift("<img src='" + PersoDatas[CHAR][PersoDatasColumns[i]] + "' alt='" + PersoDatas[CHAR]["Nom"] + "'>");
-                } else if (PersoDatas[CHAR][PersoDatasColumns[i]] !== null) {
-                    text.push(PersoDatasColumns[i] + ":<br>" + PersoDatas[CHAR][PersoDatasColumns[i]]);
-                }
-            }
-            document.getElementById("Data").innerHTML = text.join("<br><br>");
-
-            // CHAR & CHAP
-        } else if (CHAP !== null && CHAR !== null && LIEU === null) {
+        } else if (CHAP !== null && CHAR !== null) {
             if (document.getElementById("container") !== undefined) { document.getElementById("container").remove(); }
             document.getElementById("Character_Name").innerHTML = PersoDatas[CHAR]["Nom"];
             var text = [];
