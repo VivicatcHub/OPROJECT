@@ -87,6 +87,14 @@ function AjusterTaille(INPUT) {
     document.body.removeChild(Div);
 }
 
+function FlecheOrNot(TEXT) {
+    if (TEXT.includes("=>")) {
+        return ["", ""];
+    } else {
+        return ["=>", ' data-score="SS"'];
+    }
+}
+
 async function Modification(ELEMENT) {
     let Datas_Range = await DatasRange();
     let Dico_Return_Past = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), false, Datas_Range);
@@ -118,7 +126,7 @@ async function Modification(ELEMENT) {
             default:
                 try {
                     let Dico = Dico_Return_Past[D];
-                    let Temp = `=><select data-score="SS" style="color: red;">`;
+                    let Temp = FlecheOrNot(Text_Temp)[0] + "<select" + FlecheOrNot(Text_Temp)[1] + ' style="color: red;">';
                     Object.keys(Dico[0]).forEach(Element => {
                         if (Element === Liste[Compteur].value) {
                             Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -243,7 +251,12 @@ async function ModifierPage(INPUT, TYPE) {
                                     });
                                     let Temp = `<div><select>`;
                                     Object.keys(Dico[0]).forEach(Element => {
-                                        if (Data[0] == Element) {
+                                        if (Array.isArray(Data)) {
+                                            D = Data[0]
+                                        } else {
+                                            D = Data
+                                        }
+                                        if (D == Element) {
                                             Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
                                         } else {
                                             Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
@@ -264,6 +277,24 @@ async function ModifierPage(INPUT, TYPE) {
                                 case "Infos":
                                     Text_Temp += ` | <input oninput="AjusterTaille(this)" type="text" value="${Data[i]}">${Div}`;
                                     break;
+                                default:
+                                    try {
+                                        let Dico = Dico_Return[Type[i]].map((item, index) => {
+                                            return { ...item, ...(Dico_Return_Past[Type[i]][index] || {}) };
+                                        });
+                                        let Temp = `<select>`;
+                                        Object.keys(Dico[0]).forEach(Element => {
+                                            if (Data[0] == Element) {
+                                                Temp += `<option selected value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                            } else {
+                                                Temp += `<option value="${Element}">${Element} - ${Dico[0][Element]["Nom"]}</option>`;
+                                            }
+                                        });
+                                        Text_Temp += Temp + `</select>${Div}`;
+                                        break;
+                                    } catch (Error) {
+                                        console.log("Erreur,", Type[0], "n'existe pas dans le dico");
+                                    }
                             }
                         }
                     }
