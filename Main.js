@@ -478,7 +478,7 @@ async function General() {
                                 } else {
                                     El = Element;
                                 }
-                                console.log(DICT[Type][0], El)
+                                // console.log(DICT[Type][0], El)
                                 if (DICT[Type][0][El]['Image'] === undefined || DICT[Type][0][El]['Image'] === null) {
                                     TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + El + "'>" + DICT[Type][0][El]['Nom'] + "</a>";
                                 } else {
