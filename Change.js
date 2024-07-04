@@ -1,3 +1,5 @@
+var NEW = {};
+
 function AddButton(DATA, CASE) {
     let Div = document.createElement('div');
     let Button1 = document.createElement('button');
@@ -197,6 +199,8 @@ function IsNew(NUM, OBJ, DICO) {
         let Type = OBJ.parentElement.parentElement.parentElement.children[0].textContent.slice(0, -2);
         let Keys = Object.keys(DICO[Type][0]);
         let Num = Math.max(...Keys.map(Number));
+        if (NEW[Type] !== undefined && NEW[Type] !== null) { Num = Math.max(NEW[Type], Num); }
+        NEW[Type] = parseInt(Num) + 1;
         return Num + 1;
     } else {
         return NUM;
@@ -209,14 +213,15 @@ async function ModifierPage(INPUT, TYPE) {
     let Datas_Range = await DatasRange();
     let Dico_Return_Past = await DatasVictorySpe2(parseInt(localStorage.getItem(`Where${ANIME}`)));
     let Dico_Return = await DatasVictorySpe(parseInt(localStorage.getItem(`Where${ANIME}`)));
-    let Dico_Return_Spe = await DatasVictory(10000, true, Datas_Range);
+    var Dico_Return_Spe = await DatasVictory(10000, true, Datas_Range);
     let DicoAModif = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), true, Datas_Range);
     var Compteur = 0;
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
         if (Compteur === 1) {
-            Child.innerHTML = IsNew(Choix, Child, Dico_Return_Spe) + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
+            var Key = IsNew(Choix, Child, Dico_Return_Spe);
+            Child.innerHTML = Key + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
             let Type = Dico_Return_Past["Main"][Column[Compteur]].split("|");
@@ -375,17 +380,15 @@ async function ModifierPage(INPUT, TYPE) {
             Child.innerHTML += Text_Temp;
         } else if (Choix === 'new' && Compteur === 2) {
             const Nom = prompt(`Quel Nom ?`);
-            Child.innerHTML = `<div><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Nom}"></input></div>`;
-            let Key = IsNew(Choix, Child, Dico_Return_Spe, DicoAModif, TYPE);
-            DicoAModif[TYPE][0][Key] = {
-                Nom: [Nom]
-            };
+            Child.innerHTML = `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Nom}"></input></div>`;
+            DicoAModif[TYPE][0][Key] = { Nom: [Nom] };
+            Dico_Return_Spe[TYPE][0][Key] = { Nom: [Nom] };
             DicoAModif[TYPE][1].forEach(Cat => {
-                if (Cat !== "Nom") {
-                    DicoAModif[TYPE][0][Key][Cat] = null;
-                }
+                if (Cat !== "Nom") { DicoAModif[TYPE][0][Key][Cat] = null; }
             });
-            // console.log(Dico_Return);
+            Dico_Return_Spe[TYPE][1].forEach(Cat => {
+                if (Cat !== "Nom") { Dico_Return_Spe[TYPE][0][Key][Cat] = null; }
+            });
             Save(DicoAModif);
         }
         if (Compteur > 1) {

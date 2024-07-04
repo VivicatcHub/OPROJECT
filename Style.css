@@ -371,10 +371,17 @@ table img {
 .New,
 .Perso,
 .Discord {
+    max-height: 100%;
+}
+
+#Chapter_Data,
+#New_Data,
+#Perso_Data,
+#Discord_Data {
     box-sizing: border-box;
     /* Assure que le padding n'augmente pas la taille des éléments */
     overflow-y: auto;
-    max-height: 100%;
+    max-height: 50vh;
 }
 
 .Chapter h1,
@@ -486,7 +493,7 @@ table img {
     /* Affiche les données lorsque la classe .show-data est présente */
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1200px) {
     .navbar {
         padding: 0;
         flex-direction: column;
