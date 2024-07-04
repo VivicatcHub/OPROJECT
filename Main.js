@@ -447,6 +447,7 @@ async function General() {
             let Types = MAIN[DATA].split("|");
             TYPE[DATA].forEach(Element => {
                 var TempList = "";
+                var Compteur = 0;
                 Types.forEach(Type => {
                     switch (Type) {
                         case "Info":
@@ -472,14 +473,21 @@ async function General() {
                         default:
                             // console.log("Afficher - Type:", Type)
                             if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") {
-                                if (DICT[Type][0][Element[0]]['Image'] === undefined || DICT[Type][0][Element[0]]['Image'] === null) {
-                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + Element[0] + "'>" + DICT[Type][0][Element[0]]['Nom'] + "</a>";
+                                if (Array.isArray(Element)) {
+                                    El = Element[Compteur];
                                 } else {
-                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + Element[0] + "'><img class='pitite' src='" + DICT[Type][0][Element[0]]['Image'] + "'>" + DICT[Type][0][Element[0]]['Nom'] + "</a>";
+                                    El = Element;
+                                }
+                                console.log(DICT[Type][0], El)
+                                if (DICT[Type][0][El]['Image'] === undefined || DICT[Type][0][El]['Image'] === null) {
+                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + El + "'>" + DICT[Type][0][El]['Nom'] + "</a>";
+                                } else {
+                                    TempList += "<a href='index.html?chap=" + CHAP + "&" + LINK[Type] + "=" + El + "'><img class='pitite' src='" + DICT[Type][0][El]['Image'] + "'>" + DICT[Type][0][El]['Nom'] + "</a>";
                                 }
                             }
                             break;
                     }
+                    Compteur++;
                 })
                 if (TempList !== "") {
                     Affichage.push(TempList);

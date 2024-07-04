@@ -216,11 +216,12 @@ async function ModifierPage(INPUT, TYPE) {
     var Dico_Return_Spe = await DatasVictory(10000, true, Datas_Range);
     let DicoAModif = await DatasVictory(parseInt(localStorage.getItem(`Where${ANIME}`)), true, Datas_Range);
     var Compteur = 0;
+    var Key = -1;
     let [Ligne_Past, Column] = Dico_Return_Past[TYPE];
     let Ligne_Act = Dico_Return[TYPE][0];
     Array.from(Ligne.children).forEach(function (Child) {
         if (Compteur === 1) {
-            var Key = IsNew(Choix, Child, Dico_Return_Spe);
+            Key = IsNew(Choix, Child, Dico_Return_Spe);
             Child.innerHTML = Key + `<img src="${Image({ ...Ligne_Act, ...Ligne_Past }, Choix)}">`;
         } else if (Compteur > 1 && Choix !== "new" && ((Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) || (Choix in Ligne_Act && Ligne_Act[Choix][Column[Compteur]] !== null))) {
             var Text_Temp = "";
@@ -379,6 +380,7 @@ async function ModifierPage(INPUT, TYPE) {
             }
             Child.innerHTML += Text_Temp;
         } else if (Choix === 'new' && Compteur === 2) {
+            console.log(Key);
             const Nom = prompt(`Quel Nom ?`);
             Child.innerHTML = `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Nom}"></input></div>`;
             DicoAModif[TYPE][0][Key] = { Nom: [Nom] };
