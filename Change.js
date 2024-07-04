@@ -26,7 +26,7 @@ async function Add(ELEMENT, TYPE) {
     Type.forEach(D => {
         switch (D) {
             case "Info":
-            case "Infom":
+            case "Notes":
                 Text_Temp += '<input style="color: red;" oninput="AjusterTaille(this)" type="text"></input>';
                 break;
             case "Infos":
@@ -102,7 +102,7 @@ async function Modification(ELEMENT) {
     Type.forEach(D => {
         switch (D) {
             case "Info":
-            case "Infom":
+            case "Notes":
                 Parent.className = "oui";
                 Text_Temp += `=><input data-score="SS" style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Liste[Compteur].value}"></input>`;
                 break;
@@ -231,7 +231,7 @@ async function ModifierPage(INPUT, TYPE) {
                     if (!(Choix in Ligne_Act) || (Ligne_Act[Choix][Column[Compteur]] === null || !InDatas(Data, Ligne_Act[Choix][Column[Compteur]]))) {
                         switch (Type[0]) {
                             case "Info":
-                            case "Infom":
+                            case "Notes":
                                 Temp_Data = FirstValueOrOnlyOne(Data, Type.length);
                                 Text_Temp += `<div><input oninput="AjusterTaille(this)" type="text" value="${Temp_Data}"></input>${Div}`;
                                 break;
@@ -273,7 +273,7 @@ async function ModifierPage(INPUT, TYPE) {
                     let Div = DivOrNot(Type.length, 0, false);
                     switch (Type[0]) {
                         case "Info":
-                        case "Infom":
+                        case "Notes":
                             if (Array.isArray(Data[0])) {
                                 Text_Temp += `<div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[0][0]}"></input>`;
                             } else if (Array.isArray(Data)) {
@@ -333,7 +333,7 @@ async function ModifierPage(INPUT, TYPE) {
                     Div = DivOrNot(Type.length, 0, false);
                     switch (Type[0]) {
                         case "Info":
-                        case "Infom":
+                        case "Notes":
                             if (Array.isArray(Data[0])) {
                                 Text_Temp += `=><input data-score="SS" style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Data[1][0]}"></input>${Div}`;
                             }
@@ -828,6 +828,7 @@ async function GeneralModif() {
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
+                    case "Notes":
                         Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Chap_Datas_Past[localStorage.getItem(`Where${ANIME}`)][Chap_Datas_Columns_Past[NewCompteur]]}"></input></div></td>`;
                         break;
                     case "Perso":
@@ -863,9 +864,13 @@ async function GeneralModif() {
             } else {
                 switch (Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]) {
                     case "Info":
+                    case "Notes":
                         var Value = "";
                         if (Chap_Datas_Columns_Past[NewCompteur] === "Ordre") {
                             Value = parseInt(Chap_Datas_Past[GetIndexWithMaxValue(Chap_Datas_Past)][Chap_Datas_Columns_Past[NewCompteur]]) + 1;
+                        } else if (Chap_Datas_Columns_Past[NewCompteur] === "Année") {
+                            Value = Chap_Datas_Past[parseInt(localStorage.getItem(`Where${ANIME}`)) - 1]["Année"];
+                            console.log("Année:", Value);
                         }
                         Text += `<td data-score='${Main_Datas_Past[Chap_Datas_Columns_Past[NewCompteur]]}'><div class="oui"><input style="color: red;" oninput="AjusterTaille(this)" type="text" value="${Value}"></input></div></td>`;
                         break;

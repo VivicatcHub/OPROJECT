@@ -467,6 +467,8 @@ async function General() {
                             break;
                         case "Duree":
                             break;
+                        case "Notes":
+                            break;
                         default:
                             // console.log("Afficher - Type:", Type)
                             if ((Types[Types.length - 1] === "Duree" && InTime(Element[Types.length - 1], CHAP, DICT["Chapter"][0])) || Types[Types.length - 1] !== "Duree") {
