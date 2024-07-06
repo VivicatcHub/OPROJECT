@@ -67,7 +67,7 @@ async function TraiterSheetDatas(DATA, WHERE, TYPE, SPE) {
                                         for (let k = 0; k < NewData[DATA.table.rows[i].c[WhereExist].v][Datacolumns[j]].length; k++) {
                                             const array1 = NewData[DATA.table.rows[i].c[WhereExist].v][Datacolumns[j]][k];
                                             const array2 = test[0];
-                                            if (array1.length === array2.length && array1.every((value, index) => value === array2[index])) {
+                                            if (Array.isArray(array1) && Array.isArray(array2) && array1.length === array2.length && array1.every((value, index) => value === array2[index])) {
                                                 NewData[DATA.table.rows[i].c[WhereExist].v][Datacolumns[j]][k] = test[1];
                                             } else if (array1 === array2[0]) {
                                                 NewData[DATA.table.rows[i].c[WhereExist].v][Datacolumns[j]][k] = test[1][0];
