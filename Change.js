@@ -172,6 +172,7 @@ function FirstValueOrOnlyOne(DATA, BOOL) {
 }
 
 function DivOrNot(BOOL, I, BUTTON) {
+    // console.log(BOOL, I, BUTTON, I+1);
     if (BOOL === I + 1 && BUTTON) {
         return "<button onclick='Modification(this)'>Modif</button></div>";
     } else if (BOOL === I + 1) {
@@ -237,6 +238,7 @@ async function ModifierPage(INPUT, TYPE) {
             if (Choix in Ligne_Past && Ligne_Past[Choix][Column[Compteur]] !== null) {
                 Ligne_Past[Choix][Column[Compteur]].forEach(Data => {
                     let Div = DivOrNot(Type.length, 0, true);
+                    // console.log(Div, Type[0])
                     if (!(Choix in Ligne_Act) || (Ligne_Act[Choix][Column[Compteur]] === null || !InDatas(Data, Ligne_Act[Choix][Column[Compteur]]))) {
                         switch (Type[0]) {
                             case "Info":
@@ -334,7 +336,8 @@ async function ModifierPage(INPUT, TYPE) {
                                     }
                                 });
                                 Text_Temp += Temp + `</select>`;
-                                if (Array.isArray(Data[0])) {
+                                // console.log(Data[0], Div);
+                                if (!Array.isArray(Data[0])) {
                                     Text_Temp += `${Div}`;
                                 }
                                 break;
@@ -409,6 +412,7 @@ async function ModifierPage(INPUT, TYPE) {
                     }
                 });
             }
+            console.log(Text_Temp)
             Child.innerHTML += Text_Temp;
         } else if (Choix === 'new' && Compteur === 2) {
             console.log(Key);
